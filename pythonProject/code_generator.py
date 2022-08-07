@@ -1,0 +1,34 @@
+import random
+
+
+def generate_new_code(length=5):
+    # generate a numeric code:
+    # - with all-different digits,
+    # - not starting with '0'
+    # - with provided @param length
+    res = ""
+    availableDigits = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+    x = random.choice(availableDigits)
+    res += x
+    availableDigits.remove(x)
+    availableDigits.append('0')
+
+    for i in range(length - 1):
+        if not availableDigits:
+            break
+        x = random.choice(availableDigits)
+        res += x
+        availableDigits.remove(x)
+
+    return res
+
+def create_code_set(size):
+    s = set()
+    collides = 0
+    while len(s)<size:
+        newCode = generate_new_code()
+        if newCode in s:
+            collides += 1
+        else:
+            s.add(newCode)
+    return (collides,s)
