@@ -6,7 +6,7 @@
 
 #include <FastLED.h>
 
-#define NUM_LEDS 300
+#define NUM_LEDS 301
 #define LED_DATA_PIN 13
 #define NUM_BUTTONS 10
 #define SEVEN_SPEED 1000
