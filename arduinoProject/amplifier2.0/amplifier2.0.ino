@@ -100,6 +100,8 @@ void loop() {
   }
 }
 
+// modes //
+
 void runIdleMode(){
   // init mode
   sendNumClicked(0);
@@ -154,9 +156,7 @@ void runPartyMode(){
   buttonsState.setWaitReleaseAll();
   bool ledOn = false;
   byte leftMuteIndex = 0;
-//  byte leftMuteAnimationIndex = 0;
   byte rightMuteIndex = 0;
-//  byte rightMuteAnimationIndex = 0;
   byte muteLevel = 0;
   unsigned long partyModeStartTime = millis();
   
@@ -212,9 +212,13 @@ void runPartyMode(){
       ledOn = !ledOn;
       digitalWrite(12, ledOn);
     }
-    EVERY_N_MILLISECONDS(200){
+    EVERY_N_MILLISECONDS(20){
       for(byte i=0; i<leftMuteIndex; i++){
-        leds[LED_LEFT_EDGE_INDEX+i] = CRGB::Red;
+        CRGB pixel = leds[LED_LEFT_EDGE_INDEX+i];
+        decreasByte(pixel.green, 50);
+        decreasByte(pixel.blue, 50);
+        increaseByte(pixel.red, 20);
+        leds[LED_LEFT_EDGE_INDEX+i] = pixel;
       }
       for(byte i=0; i<rightMuteIndex; i++){
         leds[LED_RIGHT_EDGE_INDEX-i] = CRGB::Red;
@@ -227,9 +231,10 @@ void runPartyMode(){
 }
 
 void runCodeInputMode(){
+  enterCodeInputMode();
+  
+  sendValue(77);
   unsigned long codeInputModeTimestamp = millis();
-  Serial.write(77);
-  Serial.flush();
   byte codeSize = 0;
   byte code[5] = {0};
 
@@ -263,7 +268,10 @@ void runCodeInputMode(){
   } 
 }
 
-// methods
+
+
+// methods //
+
 void resetMuteIndex(byte &muteIndex, byte &muteLevel){
   muteIndex = 30;
   if (muteLevel > 0){
@@ -276,7 +284,6 @@ void updateCodeInput(
     byte code[], 
     byte &codeSize, 
     unsigned long codeInputModeTimestamp, bool &failed){
-    
   unsigned long currentTime = millis();
   if(currentTime - codeInputModeTimestamp > 38661){
     failed = true;
@@ -299,6 +306,8 @@ void updateCodeInput(
       change = true;
       code[codeSize] = i;
       codeSize++;
+      fillLeds(i*30, i*30+29, CRGB::Green);
+      FastLed.show();
     }
   }
 }
@@ -339,6 +348,34 @@ void sendCode(byte code[]){
   Serial.flush();
 }
 
+void enterCodeInputMode(){
+  fillLeds(0, NUM_LEDS, CRGB::Black);
+  FaseLed.show();
+  
+  for (byte greenIndex=0; greenIndex<LEDS_MIDDLE_INDEX; greenIndex++){
+    fillLeds(LEDS_MIDDLE_INDEX, LEDS_MIDDLE_INDEX+greenIndex, CRGB::Green);
+    fillLeds(LEDS_MIDDLE_INDEX-1, LEDS_MIDDLE_INDEX-greenIndex, CRGB::Green);
+    FaseLed.show();
+    delay(10);  
+  }
+  for (byte i=0; i<NUM_BUTTONS; i++){
+    fillLeds(i*30+10, i*30+10+i-1, CRGB::White);
+  }
+}
+
+void fillLeds(int from, int to, CRGB value){
+  for (int i=from; i <= to; i++){
+    leds[i] = value;
+  }
+}
+
+void decreaseByte(byte &ref, byte dif){
+  ref = (ref<dif) ? 0 : ref-dif;
+}
+
+void increaseByte(byte &ref, byte dif){
+  ref = (ref>255-diff) ? 255 : ref+diff;
+}
 void blinkLed(byte times) {
   for (byte i=0; i<times ; i++){
     digitalWrite(12, HIGH);
