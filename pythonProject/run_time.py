@@ -35,6 +35,7 @@ class AmplifierRuntime:
         self.mixer = pygame.mixer
         self.mixer.pre_init()
         self.mixer.init()
+        self.next_song = ""
 
         self.mode = Mode.IDLE
         self.mixer.music.stop()
@@ -58,7 +59,7 @@ class AmplifierRuntime:
 
                 if (msg):
                     b = msg[0]
-                    print(msg)
+                    newLinePrint(msg)
                     if b == 77: # msg to enter codeinput mode
                         self.mode = Mode.CODEINPUT
                         codeSound.play()
@@ -120,10 +121,15 @@ class AmplifierRuntime:
         self.load_next_song()
 
     def load_song_by_code(self, code):
-        self.mixer.music.load(self.song_chooser.get_song_by_code(code))
+        self.next_song = self.song_chooser.get_song_by_code(code)
+        self.mixer.music.load(self.next_song)
+        print(self.next_song, end="")
+
 
     def load_next_song(self):
-        self.mixer.music.load(self.song_chooser.get_random_song())
+        self.next_song = self.song_chooser.get_random_song()
+        self.mixer.music.load(self.next_song)
+        print(self.next_song, end="")
 
     def send_partymode_finish_msg(self):
         self.arduino.write([0])
@@ -142,3 +148,6 @@ class AmplifierRuntime:
 
 def calculate_volume(num_of_clicked) -> float:
     return (num_of_clicked + 1) / 11
+
+def newLinePrint(s):
+    print("\n", s, end="", flush=True)

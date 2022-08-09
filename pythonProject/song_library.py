@@ -6,6 +6,7 @@ from time import sleep
 import eyed3
 import csv
 import code_generator
+import run_time
 
 SONGS_FOLDER_NAME = "songs/"
 
@@ -89,7 +90,10 @@ class SongChooser:
         return self.codes_dic[code]
 
     def create_codes_dic(self):
+        print("Creating song codes dictionary")
+        eyed3.log.setLevel("ERROR")
         for collection in ALL_COLLECTIONS:
+            print(collection, end=" ", flush=True)
             for filename in os.listdir(SONGS_FOLDER_NAME + collection):
                 songpath = SONGS_FOLDER_NAME + collection + filename
                 file = eyed3.load(songpath)
@@ -97,3 +101,4 @@ class SongChooser:
                     self.codes_dic[str(file.tag.album)] = songpath
                 else:
                     pass
+        print()
