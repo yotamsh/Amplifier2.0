@@ -20,7 +20,7 @@ ALL_COLLECTIONS = [GENERAL_NAME, MORNING_NAME, CLASSIC_NAME, TV_NAME, PARTY_NAME
 
 SCHEDULE = (
     (datetime.time(0, 0), [PARTY_NAME]),
-    (datetime.time(2, 0), [[GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]]),
+    (datetime.time(2, 0), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),
     (datetime.time(6, 0), [CLASSIC_NAME]),
     (datetime.time(8, 0), [MORNING_NAME]),
     (datetime.time(10), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),

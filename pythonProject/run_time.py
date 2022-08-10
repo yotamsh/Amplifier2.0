@@ -44,69 +44,65 @@ class AmplifierRuntime:
 
     def loop(self):
         while True:
-            if self.mode == Mode.PARTYMODE:
-                if not self.mixer.music.get_busy():
-                    self.mode = Mode.IDLE
-                    self.load_next_song()
-                    self.send_partymode_finish_msg()
-            # elif self.mode == Mode.CODEINPUT and not self.mixer.music.get_busy():
-            #     self.fail_code_input()
-##            else:
-            if True:
-                msg = self.arduino.read(1)
-                #s = input("enter:")
-                #msg = bytes(eval(s))
+            if (self.mode == Mode.PARTYMODE or self.mode == Mode.AMPLIFYING) and not self.mixer.music.get_busy():
+                self.mode = Mode.IDLE
+                self.load_next_song()
+                self.send_partymode_finish_msg()
 
-                if (msg):
-                    b = msg[0]
-                    newLinePrint(msg)
-                    if b == 77: # msg to enter codeinput mode
-                        self.mode = Mode.CODEINPUT
-                        codeSound.play()
-                        self.mixer.music.load(codeInputMusicPath)
-                        self.mixer.music.set_volume(0.5)
+            msg = self.arduino.read(1)
+            # s = input("enter:")
+            # msg = bytes(eval(s))
+
+            if (msg):
+                b = msg[0]
+                newLinePrint(msg)
+                if b == 77:  # msg to enter codeinput mode
+                    self.mode = Mode.CODEINPUT
+                    codeSound.play()
+                    self.mixer.music.load(codeInputMusicPath)
+                    self.mixer.music.set_volume(0.5)
+                    self.mixer.music.play()
+                elif b == 88:  # msg to fail codeinput mode
+                    self.fail_code_input()
+                elif b == 99:  # msg with some code song
+                    msg = self.arduino.read(5)
+                    code = msg[:5].decode("ascii")
+                    if self.song_chooser.is_valid_code(code):
+                        self.send_code_valid_msg()
+                        self.mixer.music.stop()
+                        introSound.play()
+                        self.mode = Mode.PARTYMODE
+                        self.load_song_by_code(code)
+                        self.mixer.music.set_volume(1)
+                        time.sleep(3.1)
                         self.mixer.music.play()
-                    elif b == 88: # msg to fail codeinput mode
+                    else:
+                        self.send_code_invalid_msg()
                         self.fail_code_input()
-                    elif b == 99: # msg with some code song
-                        msg = self.arduino.read(5)
-                        code = msg[:5].decode("ascii")
-                        if self.song_chooser.is_valid_code(code):
-                            self.send_code_valid_msg()
-                            self.mixer.music.stop()
-                            introSound.play()
-                            self.mode = Mode.PARTYMODE
-                            self.load_song_by_code(code)
-                            self.mixer.music.set_volume(1)
-                            time.sleep(3.1)
-                            self.mixer.music.play()
-                        else:
-                            self.send_code_invalid_msg()
-                            self.fail_code_input()
-                    elif 0 <= b and b <= 10:
-                        if self.mode == Mode.IDLE and b > 0:
-                            self.mode = Mode.AMPLIFYING
-                            self.mixer.music.set_volume(calculate_volume(b))
-                            self.mixer.music.play()
-                        elif self.mode == Mode.AMPLIFYING and b == 0:
-                            self.mixer.music.stop()
+                elif 0 <= b and b <= 10:
+                    if self.mode == Mode.IDLE and b > 0:
+                        self.mode = Mode.AMPLIFYING
+                        self.mixer.music.set_volume(calculate_volume(b))
+                        self.mixer.music.play()
+                    elif self.mode == Mode.AMPLIFYING and b == 0:
+                        self.mixer.music.stop()
+                        self.mode = Mode.IDLE
+                        self.load_next_song()
+                    elif self.mode == Mode.AMPLIFYING:
+                        self.mixer.music.set_volume(calculate_volume(b))
+                    elif self.mode == Mode.PARTYMODE:
+                        self.mixer.music.set_volume(calculate_volume(10 - b))
+                        if b == 1:
+                            quiteSound.play()
+                        if b == 10:
                             self.mode = Mode.IDLE
+                            self.mixer.music.stop()
                             self.load_next_song()
-                        elif self.mode == Mode.AMPLIFYING:
-                            self.mixer.music.set_volume(calculate_volume(b))
-                        elif self.mode == Mode.PARTYMODE:
-                            self.mixer.music.set_volume(calculate_volume(10-b))
-                            if b == 1:
-                                quiteSound.play()
-                            if b == 10:
-                                self.mode = Mode.IDLE
-                                self.mixer.music.stop()
-                                self.load_next_song()
-                        if self.mode == Mode.AMPLIFYING and b == 10:
-                            self.mode = Mode.PARTYMODE
-                            winSound.play()
-                            time.sleep(0.9)
-                            self.mixer.music.set_volume(1)
+                    if self.mode == Mode.AMPLIFYING and b == 10:
+                        self.mode = Mode.PARTYMODE
+                        winSound.play()
+                        time.sleep(0.9)
+                        self.mixer.music.set_volume(1)
             current_time = datetime.datetime.now()
             if (current_time - self.last_library_update).seconds > 60:
                 self.song_chooser.update_song_collection(current_time)
