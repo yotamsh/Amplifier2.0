@@ -6,5 +6,5 @@ if __name__ == '__main__':
     print("Hi, Amplifier")
     amplifier = run_time.AmplifierRuntime()
     run_time.newLinePrint("Starting loop")
-    amplifier.loop()
+    amplifier.run()
     run_time.newLinePrint("end Main")
