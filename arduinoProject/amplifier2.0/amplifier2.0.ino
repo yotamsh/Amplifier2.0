@@ -57,7 +57,6 @@ struct buttons_state{
   void setWaitRelease(byte button){
     if(current[button]) waitRelease[button] = true;    
   }
-  
 };
 typedef struct buttons_state ButtonsState;
 
@@ -76,16 +75,14 @@ void setup() {
 
   for (byte i=0 ; i < NUM_BUTTONS ; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
-    //digitalWrite(buttonPins[i], HIGH);
     buttonsState.waitRelease[i] = true;
   }
-  fill_solid(leds, NUM_LEDS, CRGB::Black);
-  FastLED.show();
   mode = IDLE_MODE;
   sevenCounter = 0;
   sevenTimestamp = 0;
   
-  //pinMode(12, OUTPUT);
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+  FastLED.show();
 }
 
 
@@ -107,18 +104,20 @@ void loop() {
   }
 }
 
-// modes //
+// -- MODES -- //
 
+// IDLE MODE //
 void runIdleMode(){
   // init mode
   sendNumClicked(0);
+  buttonsState.updateState();
   buttonsState.setWaitReleaseAll();
-  fill_solid(leds, NUM_LEDS, CRGB::Black);
-  FastLED.show();
+  //fill_solid(leds, NUM_LEDS, CRGB::Black);
+  //FastLED.show();
   unsigned long idleModeStartTime = millis();
   int hueIndex = 0;
   int ledIndex = random16(NUM_LEDS);
-  bool reverseDirection = random8(2);
+  bool reverse = random8(2);
   
   // run mode
   while(mode == IDLE_MODE){
@@ -138,28 +137,37 @@ void runIdleMode(){
     // lighting
     if (currentTime - idleModeStartTime > 3000){
       EVERY_N_MILLISECONDS(20){
-
-        leds[ledIndex].setHSV(hueIndex, 255, 255);
-        if (reverseDirection) ledIndex--; else ledIndex++;
-        if (ledIndex==NUM_LEDS-1 || ledIndex==0) reverseDirection = !reverseDirection;
-        hueIndex += 3;
-        fadeToBlackBy(leds, NUM_LEDS, 40);
+        updateIdleModeLighting(ledIndex, hueIndex, reverse);
+      }
+    }
+    else{
+      EVERY_N_MILLISECONDS(10){
+        fadeToBlackBy(leds, NUM_LEDS, 5);
         FastLED.show();
       }
     }
   }
-  // end mode
+  // exit mode
 }
 
+void updateIdleModeLighting(int &ledIndex, int &hueIndex, bool &reverse){
+  leds[ledIndex].setHSV(hueIndex, 255, 255);
+  if (reverse) ledIndex--; else ledIndex++;
+  if (ledIndex==NUM_LEDS-1 || ledIndex==0) reverse = !reverse;
+  hueIndex += 3;
+  fadeToBlackBy(leds, NUM_LEDS, 40);
+  FastLED.show();
+}
+
+
+// AMPLIFYING MODE //
 void runAmplifyingMode(){
+  int animationIndex = 0;
+  bool reverse = false;
   if(buttonsState.total != NUM_BUTTONS){
     sendNumClicked(buttonsState.total);
   }
-  //byte buttonAnimationIndex[10] = {0};
-  int activeAnimationIndex = 0;
-  bool reverse = false;
-  bool activeAnimationHue = 0;
-  
+    
   while(mode == AMPLIFYING_MODE){
     buttonsState.updateState();
     if(buttonsState.total == 0){
@@ -176,7 +184,6 @@ void runAmplifyingMode(){
       mode = IDLE_MODE;
       break;
     }
-
     // continue running
     if(buttonsState.total != buttonsState.prevTotal){
       sendNumClicked(buttonsState.total);
@@ -185,42 +192,51 @@ void runAmplifyingMode(){
     }
     // lighting
     EVERY_N_MILLISECONDS(20){
-      for (byte i=0; i<NUM_BUTTONS; i++){
-        if (buttonsState.current[i] && !buttonsState.prev[i])
-          activeAnimationIndex = i*(NUM_LEDS/NUM_BUTTONS) + (reverse ? (NUM_LEDS/NUM_BUTTONS)-1 : 0);
-      }
-      byte button = activeAnimationIndex/(NUM_LEDS/NUM_BUTTONS);
-      if(buttonsState.current[button]
-          && (activeAnimationIndex != button*NUM_LEDS/NUM_BUTTONS + (reverse ? 0 : NUM_LEDS/NUM_BUTTONS-1))){
-        activeAnimationIndex = reverse ? activeAnimationIndex-1 : activeAnimationIndex+1;
-      }
-      else{
-        byte nextActiveButton = findNextActiveButtonAndDirection(button, reverse);
-        if (nextActiveButton != BUTTON_NOT_EXIST){
-          activeAnimationIndex = nextActiveButton*NUM_LEDS/NUM_BUTTONS + (reverse ? NUM_LEDS/NUM_BUTTONS-1 : 0);
-        }
-      }
-      uint8_t hue = beat8(30);
-      leds[activeAnimationIndex] = CHSV(hue,255,255);
-
-      for(byte i=0; i<NUM_BUTTONS; i++){
-        if (buttonsState.current[i] == UNCLICKED){
-          fill_solid(&leds[i*30], 30, CRGB::Black);
-          if (beat8(20)>240) leds[i*30+15] = CRGB::Orange;
-        }
-      }
-      FastLED.show();
+      updateAmplifyingModeLighting(animationIndex, reverse);
     }
   }
 }
 
+void updateAmplifyingModeLighting(int &animationIndex, bool &reverse){
+  // start from a recent-clicked-button
+  for (byte i=0; i<NUM_BUTTONS; i++){
+    if (buttonsState.current[i] && !buttonsState.prev[i])
+      animationIndex = i*(NUM_LEDS/NUM_BUTTONS) + (reverse ? (NUM_LEDS/NUM_BUTTONS)-1 : 0);
+  }
+  // promote amination index
+  byte button = animationIndex/(NUM_LEDS/NUM_BUTTONS);
+  if(buttonsState.current[button]
+      && (animationIndex != button*NUM_LEDS/NUM_BUTTONS + (reverse ? 0 : NUM_LEDS/NUM_BUTTONS-1))){
+    animationIndex = reverse ? animationIndex-1 : animationIndex+1;
+  }
+  else{
+    byte nextActiveButton = findNextActiveButtonAndDirection(button, reverse);
+    if (nextActiveButton != BUTTON_NOT_EXIST){
+      animationIndex = nextActiveButton*NUM_LEDS/NUM_BUTTONS + (reverse ? NUM_LEDS/NUM_BUTTONS-1 : 0);
+    }
+  }
+  // set leds
+  uint8_t hue = beat8(30);
+  leds[animationIndex] = CHSV(hue,255,255);
+
+  for(byte i=0; i<NUM_BUTTONS; i++){
+    if (buttonsState.current[i] == UNCLICKED){
+      fill_solid(&leds[i*30], 30, CRGB::Black);
+      if (beat8(20)>240) leds[i*30+15] = CRGB::Orange;
+    }
+  }
+  FastLED.show();
+}
+
+
+// PARTY MODE //
 void runPartyMode(){
-  buttonsState.setWaitReleaseAll();
   bool ledOn = false;
   byte leftMuteIndex = 0;
   byte rightMuteIndex = 0;
   byte muteLevel = 0;
   unsigned long partyModeStartTime = millis();
+  buttonsState.setWaitReleaseAll();
   
   while(mode == PARTY_MODE){
     if(Serial.available()){
@@ -232,19 +248,17 @@ void runPartyMode(){
     unsigned long currentTime = millis();
     if(currentTime - partyModeStartTime > 5000){
       buttonsState.updateState();
-      if(buttonsState.current[0]==CLICKED){
-        EVERY_N_MILLISECONDS(30) { 
-          if(leftMuteIndex<LED_MIDDLE_INDEX) leftMuteIndex++;
+
+      EVERY_N_MILLISECONDS(30){
+        if(buttonsState.current[0]==CLICKED){
+          if (leftMuteIndex<LED_MIDDLE_INDEX) leftMuteIndex++;
         }
-      }
-      else resetMuteIndex(leftMuteIndex, muteLevel);
-      
-      if(buttonsState.current[9]==CLICKED){
-        EVERY_N_MILLISECONDS(30) {
+        else resetMuteIndex(leftMuteIndex, muteLevel);
+        if(buttonsState.current[9]==CLICKED){
           if(rightMuteIndex<LED_MIDDLE_INDEX) rightMuteIndex++;
         }
-      } 
-      else resetMuteIndex(rightMuteIndex, muteLevel);
+        else resetMuteIndex(rightMuteIndex, muteLevel);
+      }
       
       bool othersFail = false;
       for (byte i=1; i < NUM_BUTTONS-1; i++){
@@ -254,13 +268,13 @@ void runPartyMode(){
         resetMuteIndex(rightMuteIndex, muteLevel);
         resetMuteIndex(leftMuteIndex, muteLevel);
         buttonsState.setWaitRelease(0);
-        buttonsState.setWaitRelease(9);
+        buttonsState.setWaitRelease(NUM_BUTTONS-1);
       }
       if (leftMuteIndex == LED_MIDDLE_INDEX 
           && rightMuteIndex == LED_MIDDLE_INDEX){
         EVERY_N_MILLISECONDS(1000) {
           muteLevel++;
-          sendValue(muteLevel);
+          sendValue(muteLevel+20);
         }
       }
       if (muteLevel == NUM_BUTTONS){
@@ -268,35 +282,51 @@ void runPartyMode(){
         break;        
       }
     }
+    else if (currentTime-partyModeStartTime>4000){
+      EVERY_N_MILLISECONDS(30){
+        if (leftMuteIndex<30){
+          leftMuteIndex++;
+          rightMuteIndex++;
+        }
+      }
+    }
     
     // lighting    
     EVERY_N_MILLISECONDS(20){
-      if (muteLevel == 0){
-        fillLeds(LED_LEFT_EDGE_INDEX+leftMuteIndex, LED_RIGHT_EDGE_INDEX-rightMuteIndex, CRGB::Black);
-        for(byte i=0; i<leftMuteIndex; i++){
-          leds[LED_LEFT_EDGE_INDEX+i]+= CRGB(20, 0, 0);
-          leds[LED_LEFT_EDGE_INDEX+i]-= CRGB(0, 50, 50);
-        }
-        for(byte i=0; i<rightMuteIndex; i++){
-          leds[LED_RIGHT_EDGE_INDEX-i]+= CRGB(20, 0, 0);
-          leds[LED_RIGHT_EDGE_INDEX-i]-= CRGB(0, 50, 50);
-        }
-      }
-      else {
-        fill_solid(&leds[NUM_LEDS/2-muteLevel*NUM_LEDS/(2*NUM_BUTTONS)], muteLevel*NUM_LEDS/NUM_BUTTONS, CHSV(160, 255,100));
-      }
-      FastLED.show();
+      updatePartyModeLighting(leftMuteIndex, rightMuteIndex, muteLevel);
     }
   }
-  // party mode end
+  // exit party mode
 }
 
+void updatePartyModeLighting(byte leftMuteIndex, byte rightMuteIndex, byte muteLevel){
+  
+  if (muteLevel == 0){
+    fill_rainbow(&leds[LED_LEFT_EDGE_INDEX+leftMuteIndex], NUM_LEDS-leftMuteIndex-rightMuteIndex, beatsin8(11)+beatsin8(30)+beatsin8(41)+leftMuteIndex, 5);
+    //fillLeds(LED_LEFT_EDGE_INDEX+leftMuteIndex, LED_RIGHT_EDGE_INDEX-rightMuteIndex, CRGB::Black);
+    for(byte i=0; i<leftMuteIndex; i++){
+      leds[LED_LEFT_EDGE_INDEX+i]+= CRGB(10, 0, 0);
+      leds[LED_LEFT_EDGE_INDEX+i]-= CRGB(0, 10, 10);
+    }
+    for(byte i=0; i<rightMuteIndex; i++){
+      leds[LED_RIGHT_EDGE_INDEX-i]+= CRGB(10, 0, 0);
+      leds[LED_RIGHT_EDGE_INDEX-i]-= CRGB(0, 10, 10);
+    }
+  }
+  else {
+    //fill_solid(&leds[NUM_LEDS/2-muteLevel*(NUM_LEDS/(NUM_BUTTONS-1))/2], muteLevel*NUM_LEDS/(NUM_BUTTONS-1), CHSV(HUE_BLUE, 255,100));
+    fill_solid(&leds[(NUM_BUTTONS-1-((int)muteLevel))*(NUM_LEDS/2)/(NUM_BUTTONS-1)], ((int)muteLevel)*NUM_LEDS/(NUM_BUTTONS-1), CHSV(HUE_BLUE, 255,100));
+  }
+  FastLED.show();
+}
+
+// CODE INPUT MODE //
 void runCodeInputMode(){  
-  sendValue(77);
-  enterCodeInputMode();
   unsigned long codeInputModeTimestamp = millis();
   byte codeSize = 0;
   byte code[5] = {0};
+  sendValue(77);
+  enterCodeInputModeLighting();
 
   while(mode == CODE_INPUT_MODE){
     delay(100);
@@ -313,14 +343,15 @@ void runCodeInputMode(){
     }
     else if (codeSize == 5) {
       sendCode(code);
-      while(!Serial.available()){}
-      int msg = Serial.read();
-      if (msg == 1) { // valid code
+      int msg = waitResponse();
+      if (msg == 1) { 
+        // valid code
         mode = PARTY_MODE;
         delay(3100); // party mode intro
         break;        
       }
-      else{ // invalid code
+      else{ 
+        // invalid code
         mode = IDLE_MODE;
         fill_solid(leds, NUM_LEDS, CRGB::Red);
         FastLED.show();
@@ -333,9 +364,24 @@ void runCodeInputMode(){
   } 
 }
 
+void enterCodeInputModeLighting(){
+  fill_solid(leds, NUM_LEDS, CRGB::Black);
+  FastLED.show();
+  
+  for (byte greenIndex=0; greenIndex<LED_MIDDLE_INDEX; greenIndex=greenIndex+2){
+    fill_solid(&leds[LED_MIDDLE_INDEX-greenIndex], 2*greenIndex, CRGB::Green);
+    FastLED.show();
+  }
+  fill_solid(leds, NUM_LEDS, CHSV(HUE_PURPLE,255,60));
+  for (byte i=0; i<NUM_BUTTONS; i++){
+    fill_solid(&leds[i*30+10], i, CRGB::White);
+  }
+  FastLED.show();
+}
 
 
-// methods //
+
+// -- METHODS -- //
 
 void resetMuteIndex(byte &muteIndex, byte &muteLevel){
   muteIndex = 30;
@@ -413,20 +459,10 @@ void sendCode(byte code[]){
   Serial.flush();
 }
 
-void enterCodeInputMode(){
-  fill_solid(leds, NUM_LEDS, CRGB::Black);
-  FastLED.show();
-  
-  for (byte greenIndex=0; greenIndex<LED_MIDDLE_INDEX; greenIndex=greenIndex+2){
-    fill_solid(&leds[LED_MIDDLE_INDEX], greenIndex, CRGB::Green);
-    fill_solid(&leds[LED_MIDDLE_INDEX-greenIndex], greenIndex, CRGB::Green);
-    FastLED.show();
-  }
-  fill_solid(leds, NUM_LEDS, CHSV(HUE_PURPLE,255,50));
-  for (byte i=0; i<NUM_BUTTONS; i++){
-    fill_solid(&leds[i*30+10], i, CRGB::White);
-  }
-  FastLED.show();
+int waitResponse(){
+  while(!Serial.available()){}
+  int msg = Serial.read();
+  return msg;
 }
 
 byte findNextActiveButtonAndDirection(byte button, bool &reversed){
