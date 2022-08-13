@@ -29,12 +29,13 @@ MSG_CODE_VALID = 1
 
 pygame.init()
 
-winSound = pygame.mixer.Sound("sounds/win3.mp3")
-codeSound = pygame.mixer.Sound("sounds/code2.mp3")
+winSound = pygame.mixer.Sound("sounds/win.mp3")
+codeSound = pygame.mixer.Sound("sounds/code.mp3")
 introSound = pygame.mixer.Sound("sounds/one_two_three.mp3")
 codeInputMusicPath = "sounds/sheshtus.mp3"
-failSounds = ["fail1.mp3", "fail2.mp3", "fail3.mp3"]
+failSounds = ["fail1.mp3", "fail2.mp3", "fail3.mp3", "fail4.mp3"]
 quiteSound = pygame.mixer.Sound("sounds/quite.mp3")
+boomSound = pygame.mixer.Sound("sounds/boom.mp3")
 
 
 class AmplifierRuntime:
@@ -121,6 +122,7 @@ class AmplifierRuntime:
                 elif mute_level == 10:
                     self.mode = Mode.IDLE
                     self.mixer.music.stop()
+                    boomSound.play()
                     self.logger.log_exit_full_volume(self.current_song)
             elif not self.mixer.music.get_busy():
                 self.send_partymode_finish_msg()
@@ -199,7 +201,7 @@ class AmplifierRuntime:
 
 
 def calculate_volume(num_of_clicked) -> float:
-    return (num_of_clicked + 1) / 11
+    return pow((num_of_clicked + 1) / 11, 2)
 
 
 def newLinePrint(s):
