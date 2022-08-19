@@ -1,7 +1,6 @@
 import random
 
-
-def generate_new_code(length=5):
+def generate_new_code(length):
     # generate a numeric code:
     # - with all-different digits,
     # - not starting with '0'
@@ -22,13 +21,14 @@ def generate_new_code(length=5):
 
     return res
 
-def create_code_set(size):
+
+def create_code_set(size, codeLength):
     s = set()
     collides = 0
-    while len(s)<size:
-        newCode = generate_new_code()
+    while len(s) < size:
+        newCode = generate_new_code(codeLength)
         if newCode in s:
             collides += 1
         else:
             s.add(newCode)
-    return (collides,s)
+    return (s, collides)

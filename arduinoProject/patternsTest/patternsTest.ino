@@ -6,11 +6,20 @@
 CRGB leds[NUM_LEDS];
 int ind = 0;
 
+DEFINE_GRADIENT_PALETTE(col){
+  0, 0, 197, 255,
+  64, 250, 0, 255,
+  128, 89, 255, 63,
+  192, 255, 160, 0,
+  255, 0, 197, 255
+};
+CRGBPalette16 myPal = col;
 
 void setup() {
   // put your setup code here, to run once:
   FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical  
   FastLED.setBrightness(20);
+  FastLED.setCorrection(TypicalSMD5050);
   Serial.begin(9600);
   
 }
@@ -48,6 +57,7 @@ struct Baloon{
 Baloon currentBaloon = Baloon(0,30,random8(255));
 byte tetrisHue = 0;
 byte rainbowHue = 0;
+byte paletteInd = 0;
 
 void loop() { 
   EVERY_N_MILLISECONDS(20){
@@ -77,6 +87,8 @@ void loop() {
     fill_solid(&leds[140], edge, CHSV(beatsin8(20,0,30),255,255));
     fill_solid(&leds[140+edge], 30-edge, CHSV(beatsin8(18,100,150),255,255));
     
+    fill_palette(&leds[175], 30 , paletteInd, 255/30, myPal, 255, LINEARBLEND);
+    (paletteInd == NUM_LEDS) ? 0 : paletteInd++;
     
     FastLED.show();
   }

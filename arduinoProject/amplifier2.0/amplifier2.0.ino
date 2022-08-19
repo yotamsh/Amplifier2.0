@@ -17,6 +17,7 @@
 #define LED_MIDDLE_INDEX 150
 #define BUTTON_NOT_EXIST (NUM_BUTTONS+1)
 #define FIREWORK_LEN 15
+#define CODE_LENGTH 5
 
 #define IDLE_MODE 0b1
 #define AMPLIFYING_MODE 0b10
@@ -26,6 +27,8 @@
 // pins of button number {0, 1, ... , 9}
 byte buttonPins[NUM_BUTTONS] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 boolean testing = true;
+
+// Structs //
 
 struct buttons_state{
   byte prev[NUM_BUTTONS] = {0};
@@ -64,6 +67,7 @@ struct firework {
   int m_startIndex;
   int m_index;
   CRGB m_color;
+  
   firework() {
     m_startIndex = -1;
   }
@@ -97,6 +101,7 @@ struct firework {
 };
 typedef struct firework Firework;
 
+// GLOBALS //
 
 ButtonsState buttonsState;
 CRGB leds[NUM_LEDS];
@@ -109,6 +114,7 @@ void setup() {
   Serial.begin(9600);
   FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical  
   FastLED.setBrightness(20);
+  FastLED.setCorrection(TypicalSMD5050);
 
   for (byte i=0 ; i < NUM_BUTTONS ; i++){
     pinMode(buttonPins[i], INPUT_PULLUP);
@@ -334,7 +340,7 @@ void runPartyMode(){
     
     // lighting    
     if (startAnimation < NUM_LEDS/2){
-      fill_rainbow(&leds[LED_LEFT_EDGE_INDEX+leftMuteIndex], NUM_LEDS-leftMuteIndex-rightMuteIndex, beatsin8(11)+beatsin8(30)+beatsin8(41)+leftMuteIndex, 5);
+      fill_rainbow(&leds[LED_LEFT_EDGE_INDEX+leftMuteIndex], NUM_LEDS-leftMuteIndex-rightMuteIndex, beatsin8(7)+beatsin8(15)+beatsin8(19)+leftMuteIndex, 5);
       fill_solid(leds, NUM_LEDS/2-startAnimation, CRGB::Black);
       fill_solid(&leds[NUM_LEDS/2+startAnimation], NUM_LEDS/2-startAnimation, CRGB::Black);
       FastLED.show();
@@ -376,7 +382,7 @@ void updatePartyModeLighting(byte startAnimation, byte leftMuteIndex, byte right
 void runCodeInputMode(){  
   unsigned long codeInputModeTimestamp = millis();
   byte codeSize = 0;
-  byte code[5] = {0};
+  byte code[CODE_LENGTH] = {0};
   sendValue(77);
   enterCodeInputModeLighting();
 
@@ -393,7 +399,7 @@ void runCodeInputMode(){
       mode = IDLE_MODE;
       break;
     }
-    else if (codeSize == 5) {
+    else if (codeSize == CODE_LENGTH) {
       sendCode(code);
       int msg = waitResponse();
       if (msg == 1) { 
@@ -505,7 +511,7 @@ void sendValue(byte value)
 
 void sendCode(byte code[]){
   Serial.write(99);
-  for(byte i=0; i<5; i++){
+  for(byte i=0; i<CODE_LENGTH; i++){
     Serial.write(code[i]+48);
   }
   Serial.flush();
@@ -537,19 +543,3 @@ void fillLeds(int from, int to, CRGB value){
     leds[i] = value;
   }
 }
-//
-//void decreaseByte(byte &ref, byte dif){
-//  ref = (ref<dif) ? 0 : ref-dif;
-//}
-//
-//void increaseByte(byte &ref, byte dif){
-//  ref = (ref>255-dif) ? 255 : ref+dif;
-//}
-//void blinkLed(byte times) {
-//  for (byte i=0; i<times ; i++){
-//    digitalWrite(12, HIGH);
-//    delay(200);
-//    digitalWrite(12, LOW);
-//    delay(200);
-//  }
-//}

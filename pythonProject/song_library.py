@@ -1,56 +1,90 @@
-import os
+import csv
 import datetime
+import os
 import random
-from time import sleep
+from collections import namedtuple
 
 import eyed3
-import csv
 import code_generator
-import run_time
+from enum import Enum
+
+CODE_LENGTH = 5
 
 SONGS_FOLDER_NAME = "songs/"
 
-GENERAL_NAME = "general/"
-MORNING_NAME = "morning/"
-PARTY_NAME = "party/"
-TV_NAME = "tv/"
-CLASSIC_NAME = "classic/"
 
-ALL_COLLECTIONS = [GENERAL_NAME, MORNING_NAME, CLASSIC_NAME, TV_NAME, PARTY_NAME]
-
-SCHEDULE = (
-    (datetime.time(0, 0), [PARTY_NAME]),
-    (datetime.time(2, 0), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),
-    (datetime.time(6, 0), [CLASSIC_NAME]),
-    (datetime.time(8, 0), [MORNING_NAME]),
-    (datetime.time(10), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),
-    (datetime.time(11), [TV_NAME]),
-    (datetime.time(12), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),
-    (datetime.time(16), [TV_NAME]),
-    (datetime.time(17), ALL_COLLECTIONS),
-    (datetime.time(18), [GENERAL_NAME, PARTY_NAME, MORNING_NAME, CLASSIC_NAME]),
-)
+class Collection(Enum):
+    GENERAL = "general/"
+    MORNING = "morning/"
+    PARTY = "party/"
+    TV = "tv/"
+    CLASSIC = "classic/"
 
 
-def find_schedule_index(current_time: datetime.datetime):
-    schedule_index = 0
-    current_hour = current_time.time()
-    while schedule_index < len(SCHEDULE) - 1 and current_hour > SCHEDULE[schedule_index + 1][0]:
-        schedule_index += 1
-    return schedule_index
+ALL_COLLECTIONS = {collection for collection in Collection}
+
+
+class Schedule():
+    DailyScheduleEntry = namedtuple("DailyScheduleEntry", ["time", "collections"])
+    SpecialScheduleEntry = namedtuple("SpecialScheduleEntry", ["start", "end", "collections"])
+
+    DAILY_SCHEDULE = (
+        DailyScheduleEntry(datetime.time(0, 0),
+                           {Collection.PARTY}),
+        DailyScheduleEntry(datetime.time(2, 0),
+                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+        DailyScheduleEntry(datetime.time(6, 0),
+                           {Collection.CLASSIC}),
+        DailyScheduleEntry(datetime.time(8, 0),
+                           {Collection.MORNING}),
+        DailyScheduleEntry(datetime.time(10),
+                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+        DailyScheduleEntry(datetime.time(11),
+                           {Collection.TV}),
+        DailyScheduleEntry(datetime.time(12),
+                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING}),
+        DailyScheduleEntry(datetime.time(16),
+                           {Collection.TV}),
+        DailyScheduleEntry(datetime.time(17),
+                           ALL_COLLECTIONS),
+        DailyScheduleEntry(datetime.time(19),
+                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+    )
+
+    SPECIAL_SCHEDULE = (
+        # start (datetime.datetime), end (datetime.datetime), collections (tuple of Collections)
+        SpecialScheduleEntry(start=datetime.datetime(2022, 8, 18, 16, 00),
+                             end=datetime.datetime(2022, 8, 18, 16, 30),
+                             collections={Collection.TV}),
+        SpecialScheduleEntry(start=datetime.datetime(2022, 8, 18, 18, 00),
+                             end=datetime.datetime(2022, 8, 18, 20, 30),
+                             collections={Collection.TV}),
+    )
+
+    @staticmethod
+    def get_collections_by_time(current_time) -> set:
+        for special_schedule_entry in Schedule.SPECIAL_SCHEDULE:
+            if special_schedule_entry.start < current_time < special_schedule_entry.end:
+                return special_schedule_entry.collections
+        schedule_index = 0
+        current_hour = current_time.time()
+        while schedule_index < len(Schedule.DAILY_SCHEDULE) - 1 \
+                and current_hour > Schedule.DAILY_SCHEDULE[schedule_index + 1].time:
+            schedule_index += 1
+        return Schedule.DAILY_SCHEDULE[schedule_index].collections
 
 
 def regenerate_codes_all_songs():
     with open('AmplifierSongCodes.csv', 'w', newline='') as database_file:
         writer = csv.writer(database_file)
-        writer.writerow(["Song Name", "Code"])
+        writer.writerow(["Collection", "Song Name", "Code"])
         s = set()
         for collection in ALL_COLLECTIONS:
-            for filename in os.listdir(SONGS_FOLDER_NAME + collection):
-                songpath = SONGS_FOLDER_NAME + collection + filename
+            for file_path in os.listdir(SONGS_FOLDER_NAME + collection.value):
+                songpath = SONGS_FOLDER_NAME + collection.value + file_path
                 print(f"Generating new code for: {songpath}")
                 audio_file = eyed3.load(songpath)
-                new_code = code_generator.generate_new_code()
+                new_code = code_generator.generate_new_code(CODE_LENGTH)
                 while new_code in s:
                     new_code = code_generator.generate_new_code()
                 if not audio_file.tag:
@@ -58,30 +92,32 @@ def regenerate_codes_all_songs():
                 audio_file.tag.album = new_code
                 audio_file.tag.save(version=eyed3.id3.tag.ID3_V2_3)
                 s.add(new_code)
-                writer.writerow([filename, new_code])
+                writer.writerow([collection.name, get_song_name(file_path), new_code])
 
 
 class SongChooser:
-    current_schedule_index = -1
-    current_song_collection = []
+    current_collections = {}
+    current_songs_basket = []
     codes_dic = {}
 
-    def __init__(self):
-        self.update_song_collection(datetime.datetime.now())
+    def __init__(self, logger):
+        self.logger = logger
+        self.update_collection_schedule(datetime.datetime.now(), self.logger)
         self.create_codes_dic()
 
-    def update_song_collection(self, current_time):
-        x = find_schedule_index(current_time)
-        if x != self.current_schedule_index:
-            self.current_song_collection = []
-            for collection in SCHEDULE[x][1]:
-                self.current_song_collection.extend(
-                    SONGS_FOLDER_NAME + collection + filename
-                    for filename in os.listdir(SONGS_FOLDER_NAME + collection))
-            self.current_schedule_index = x
+    def update_collection_schedule(self, current_time, logger):
+        current_collections = Schedule.get_collections_by_time(current_time)
+        if current_collections != self.current_collections:
+            self.current_collections = current_collections
+            logger.log_collections_update(self.current_collections)
+            self.current_songs_basket = []
+            for collection in self.current_collections:
+                self.current_songs_basket.extend(
+                    SONGS_FOLDER_NAME + collection.value + filename
+                    for filename in os.listdir(SONGS_FOLDER_NAME + collection.value))
 
     def get_random_song(self) -> str:
-        return random.choice(self.current_song_collection)
+        return random.choice(self.current_songs_basket)
 
     def is_valid_code(self, code):
         return code in self.codes_dic
@@ -93,12 +129,16 @@ class SongChooser:
         print("Creating song codes dictionary")
         eyed3.log.setLevel("ERROR")
         for collection in ALL_COLLECTIONS:
-            print(collection, end=" ", flush=True)
-            for filename in os.listdir(SONGS_FOLDER_NAME + collection):
-                songpath = SONGS_FOLDER_NAME + collection + filename
+            print(collection.name, end=" ", flush=True)
+            for filename in os.listdir(SONGS_FOLDER_NAME + collection.value):
+                songpath = SONGS_FOLDER_NAME + collection.value + filename
                 file = eyed3.load(songpath)
                 if file.tag and str(file.tag.album):
                     self.codes_dic[str(file.tag.album)] = songpath
                 else:
                     pass
         print()
+
+
+def get_song_name(song_path):
+    return song_path.split("/")[-1][:-4]
