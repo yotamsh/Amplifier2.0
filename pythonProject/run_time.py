@@ -6,7 +6,7 @@ from enum import Enum
 import pygame
 import serial
 
-import logger
+import logs
 import song_library
 from song_library import CODE_LENGTH
 
@@ -40,22 +40,22 @@ boomSound = pygame.mixer.Sound("sounds/boom.mp3")
 class AmplifierRuntime:
 
     def __init__(self):
-        self.logger = logger.Logger()
-        self.song_chooser = song_library.SongChooser(self.logger)
-        self.volume_manager = VolumeManager()
-        self.last_schedule_update = datetime.datetime.now()
         self.arduino = serial.Serial(port="COM5", baudrate=9600, timeout=0.1, )
         self.mixer = pygame.mixer
         self.mixer.pre_init()
         self.mixer.init()
-        self.current_song = ""
+        self.logger = logs.Logger()
+        self.song_chooser = song_library.SongChooser(self.logger)
+        self.volume_manager = VolumeManager(self.mixer, self.logger)
+        self.last_schedule_update = datetime.datetime.now()
 
+        self.current_song = ""
         self.mode = Mode.IDLE
         self.mixer.music.stop()
         self.load_next_song()
 
     def run(self):
-        codeSound.play()
+        self.volume_manager.play_sound_with_volume(codeSound)
         while True:
             if self.mode == Mode.IDLE:
                 self.run_idle_mode()
@@ -73,16 +73,16 @@ class AmplifierRuntime:
         while self.mode == Mode.IDLE:
             button_clicked = self.recieve_byte_msg()
             if button_clicked != NO_DATA:
-                if 0 < button_clicked < 10:
+                if 0 < button_clicked < NUM_BUTTONS:
                     self.mode = Mode.AMPLIFYING
-                    self.mixer.music.set_volume(self.volume_manager.calculate_volume(button_clicked))
-                if button_clicked == 10:
+                    self.volume_manager.set_music_volume_by_buttons(button_clicked)
+                if button_clicked == NUM_BUTTONS:
                     self.mode = Mode.PARTYMODE
-                    self.mixer.music.set_volume(8)
+                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS - 2)
                     self.mixer.music.play()
-                    winSound.play()
+                    self.volume_manager.play_sound_with_volume(winSound)
                     time.sleep(0.9)
-                    self.mixer.music.set_volume(1)
+                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS)
                 elif button_clicked == START_CODE_INPUT:
                     self.mode = Mode.CODEINPUT
             else:
@@ -97,12 +97,12 @@ class AmplifierRuntime:
                     self.mixer.music.stop()
                     self.mode = Mode.IDLE
                 elif 0 < buttons_clicked < 10:
-                    self.mixer.music.set_volume(self.volume_manager.calculate_volume(buttons_clicked))
+                    self.volume_manager.set_music_volume_by_buttons(buttons_clicked)
                 elif buttons_clicked == 10:
                     self.mode = Mode.PARTYMODE
-                    winSound.play()
+                    self.volume_manager.play_sound_with_volume(winSound)
                     time.sleep(0.9)
-                    self.mixer.music.set_volume(1)
+                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS)
                 elif buttons_clicked == START_CODE_INPUT:
                     self.mode = Mode.CODEINPUT
 
@@ -114,24 +114,24 @@ class AmplifierRuntime:
         self.logger.log_new_full_volume(self.current_song)
         while self.mode == Mode.PARTYMODE:
             byte = self.recieve_byte_msg()
-            if byte != NO_DATA:
+            if 20 <= byte <= 30:
                 mute_level = byte - 20
-                self.mixer.music.set_volume(self.volume_manager.calculate_volume(10 - mute_level))
+                self.volume_manager.set_music_volume_by_buttons(10 - mute_level)
                 if mute_level == 1:
-                    quiteSound.play()
+                    self.volume_manager.play_sound_with_volume(quiteSound, 1)
                 elif mute_level == 10:
                     self.mode = Mode.IDLE
                     self.mixer.music.stop()
-                    boomSound.play()
+                    self.volume_manager.play_sound_with_volume(boomSound, 0.3)
                     self.logger.log_exit_full_volume(self.current_song)
             elif not self.mixer.music.get_busy():
                 self.send_partymode_finish_msg()
                 self.mode = Mode.IDLE
 
     def run_code_input_mode(self):
-        codeSound.play()
+        self.volume_manager.play_sound_with_volume(codeSound, 0.3)
         self.mixer.music.load(codeInputMusicPath)
-        self.mixer.music.set_volume(0.5)
+        self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS / 2)
         self.mixer.music.play()
         while self.mode == Mode.CODEINPUT:
             msg = self.recieve_byte_msg()
@@ -144,10 +144,10 @@ class AmplifierRuntime:
                     if self.song_chooser.is_valid_code(code):
                         self.send_code_valid_msg()
                         self.mixer.music.stop()
-                        introSound.play()
+                        self.volume_manager.play_sound_with_volume(introSound, 0.8)
                         self.mode = Mode.PARTYMODE
                         self.load_song_by_code(code)
-                        self.mixer.music.set_volume(1)
+                        self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS)
                         time.sleep(3.1)
                         self.mixer.music.play()
                         print(" " + self.current_song, end="", flush=True)
@@ -163,7 +163,7 @@ class AmplifierRuntime:
         current_time = datetime.datetime.now()
         if (current_time - self.last_schedule_update).seconds > 60:
             self.song_chooser.update_collection_schedule(current_time, self.logger)
-            self.volume_manager.update_volume_schedule(current_time, self.logger)
+            self.volume_manager.update_volume_schedule(current_time)
             self.last_schedule_update = current_time
 
     def load_song_by_code(self, code):
@@ -176,8 +176,11 @@ class AmplifierRuntime:
 
     def recieve_byte_msg(self):
         msg = self.arduino.read(1)
-        if (msg):
-            newLinePrint(msg)
+        if msg:
+            if 20 <= msg[0] <= 31:
+                print(int(msg[0]) - 30, end=", ", flush=True)
+            else:
+                new_line_print(msg)
             return msg[0]
         else:
             return NO_DATA
@@ -198,8 +201,7 @@ class AmplifierRuntime:
     def play_fail_sound(self):
         path = "sounds/" + random.choice(failSounds)
         sound = pygame.mixer.Sound(path)
-        sound.play()
-
+        self.volume_manager.play_sound_with_volume(sound, 0.2)
 
 class VolumeManager():
     VolumeScheduleEntry = namedtuple("volumeScheduleEntry", ["time", "max_volume"])
@@ -208,25 +210,36 @@ class VolumeManager():
 
     VOLUME_SCHEDULE = (
         VolumeScheduleEntry(datetime.time(0, 0), 1),
-        VolumeScheduleEntry(datetime.time(1, 0), 0.5),
-        VolumeScheduleEntry(datetime.time(2, 0), 1)
     )
 
-    def calculate_volume(self, num_of_clicked) -> float:
-        relative_volume = pow((num_of_clicked + 1) / 11, 2)
-        return relative_volume * self.current_max_volume
+    def __init__(self, mixer, logger):
+        self.mixer = mixer
+        self.logger = logger
+        self.update_volume_schedule(datetime.datetime.now())
 
-    def update_volume_schedule(self, current_time, logger):
+    def set_music_volume_by_buttons(self, num_of_clicked):
+        self.mixer.music.set_volume(
+            VolumeManager.__calculate_volume_by_buttons(num_of_clicked) * self.current_max_volume)
+
+    def play_sound_with_volume(self, sound, volume=0.3):
+        sound.set_volume(volume * self.current_max_volume)
+        sound.play()
+
+    @staticmethod
+    def __calculate_volume_by_buttons(num_of_clicked) -> float:
+        return pow((num_of_clicked + 2) / (NUM_BUTTONS + 2), 2)
+
+    def update_volume_schedule(self, current_time):
         schedule_index = 0
         current_hour = current_time.time()
         while schedule_index < len(self.VOLUME_SCHEDULE) - 1 \
                 and current_hour > self.VOLUME_SCHEDULE[schedule_index + 1].time:
             schedule_index += 1
-        if self.current_max_volume != schedule_index:
+        if self.current_schedule_index != schedule_index:
             self.current_schedule_index = schedule_index
             self.current_max_volume = self.VOLUME_SCHEDULE[self.current_schedule_index].max_volume
-            logger.log_max_volume_update(self.current_max_volume)
+            self.logger.log_max_volume_update(self.current_max_volume)
 
 
-def newLinePrint(s):
+def new_line_print(s):
     print("\n", s, end="", flush=True)
