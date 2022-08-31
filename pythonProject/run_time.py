@@ -209,7 +209,9 @@ class VolumeManager():
     current_max_volume = 1
 
     VOLUME_SCHEDULE = (
-        VolumeScheduleEntry(datetime.time(0, 0), 1),
+        VolumeScheduleEntry(datetime.time(0, 0), 0.5),
+        VolumeScheduleEntry(datetime.time(6, 0), 1),
+        VolumeScheduleEntry(datetime.time(23, 0), 0.5),
     )
 
     def __init__(self, mixer, logger):

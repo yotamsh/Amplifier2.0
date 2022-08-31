@@ -19,10 +19,11 @@ class Collection(Enum):
     PARTY = "party/"
     TV = "tv/"
     CLASSIC = "classic/"
+    DISNEY = "disney/"
 
 
 ALL_COLLECTIONS = {collection for collection in Collection}
-
+ALL_COLLECTIONS_EXCEPT_TV = {collection for collection in Collection if collection is not Collection.TV}
 
 class Schedule():
     DailyScheduleEntry = namedtuple("DailyScheduleEntry", ["time", "collections"])
@@ -32,23 +33,27 @@ class Schedule():
         DailyScheduleEntry(datetime.time(0, 0),
                            {Collection.PARTY}),
         DailyScheduleEntry(datetime.time(2, 0),
-                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+                           ALL_COLLECTIONS_EXCEPT_TV),
         DailyScheduleEntry(datetime.time(6, 0),
                            {Collection.CLASSIC}),
         DailyScheduleEntry(datetime.time(8, 0),
                            {Collection.MORNING}),
         DailyScheduleEntry(datetime.time(10),
-                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+                           ALL_COLLECTIONS_EXCEPT_TV),
         DailyScheduleEntry(datetime.time(11),
                            {Collection.TV}),
         DailyScheduleEntry(datetime.time(12),
-                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING}),
+                           {Collection.GENERAL, Collection.DISNEY, Collection.PARTY, Collection.MORNING}),
         DailyScheduleEntry(datetime.time(16),
                            {Collection.TV}),
         DailyScheduleEntry(datetime.time(17),
                            ALL_COLLECTIONS),
-        DailyScheduleEntry(datetime.time(19),
-                           {Collection.GENERAL, Collection.PARTY, Collection.MORNING, Collection.CLASSIC}),
+        DailyScheduleEntry(datetime.time(18),
+                           ALL_COLLECTIONS_EXCEPT_TV),
+        DailyScheduleEntry(datetime.time(20),
+                           {Collection.DISNEY}),
+        DailyScheduleEntry(datetime.time(20, 30),
+                           {Collection.GENERAL, Collection.DISNEY, Collection.PARTY, Collection.MORNING}),
     )
 
     SPECIAL_SCHEDULE = (
@@ -75,25 +80,30 @@ class Schedule():
 
 
 def regenerate_codes_all_songs():
+    num_songs = 0
+    num_collides = 0
     with open('AmplifierSongCodes.csv', 'w', newline='') as database_file:
         writer = csv.writer(database_file)
         writer.writerow(["Collection", "Song Name", "Code"])
         s = set()
         for collection in ALL_COLLECTIONS:
             for file_path in os.listdir(SONGS_FOLDER_NAME + collection.value):
+                num_songs += 1
                 songpath = SONGS_FOLDER_NAME + collection.value + file_path
                 print(f"Generating new code for: {songpath}")
                 audio_file = eyed3.load(songpath)
                 new_code = code_generator.generate_new_code(CODE_LENGTH)
                 while new_code in s:
-                    new_code = code_generator.generate_new_code()
+                    num_collides += 1
+                    new_code = code_generator.generate_new_code(CODE_LENGTH)
                 if not audio_file.tag:
                     audio_file.tag = eyed3.id3.tag.Tag()
                 audio_file.tag.album = new_code
                 audio_file.tag.save(version=eyed3.id3.tag.ID3_V2_3)
                 s.add(new_code)
                 writer.writerow([collection.name, get_song_name(file_path), new_code])
-
+    print("Finished regenerating song codes.")
+    print(f'total songs = {num_songs}, num of collides = {num_collides}.')
 
 class SongChooser:
     current_collections = {}
