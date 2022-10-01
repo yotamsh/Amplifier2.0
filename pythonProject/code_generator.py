@@ -1,5 +1,6 @@
 import random
 
+
 def generate_new_code(length):
     # generate a numeric code:
     # - with all-different digits,
@@ -20,6 +21,13 @@ def generate_new_code(length):
         availableDigits.remove(x)
 
     return res
+
+
+def is_valid_code(code, expected_length):
+    return type(code) is str \
+           and len(code) == expected_length \
+           and code.isdigit() \
+           and code[0] != '0'
 
 
 def create_code_set(size, codeLength):

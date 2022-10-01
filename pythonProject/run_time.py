@@ -26,6 +26,8 @@ GET_CODE_INPUT = 99
 MSG_CODE_INVALID = 0
 MSG_CODE_VALID = 1
 
+LOW_VOLUME_LIMIT = 0.4
+
 pygame.init()
 
 winSound = pygame.mixer.Sound("sounds/win.mp3")
@@ -40,7 +42,7 @@ boomSound = pygame.mixer.Sound("sounds/boom.mp3")
 class AmplifierRuntime:
 
     def __init__(self):
-        self.arduino = serial.Serial(port="COM5", baudrate=9600, timeout=0.1, )
+        self.arduino = serial.Serial(port="COM7", baudrate=9600, timeout=0.1, )
         self.mixer = pygame.mixer
         self.mixer.pre_init()
         self.mixer.init()
@@ -78,7 +80,7 @@ class AmplifierRuntime:
                     self.volume_manager.set_music_volume_by_buttons(button_clicked)
                 if button_clicked == NUM_BUTTONS:
                     self.mode = Mode.PARTYMODE
-                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS - 2)
+                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS - 3)
                     self.mixer.music.play()
                     self.volume_manager.play_sound_with_volume(winSound)
                     time.sleep(0.9)
@@ -96,11 +98,12 @@ class AmplifierRuntime:
                 if buttons_clicked == 0:
                     self.mixer.music.stop()
                     self.mode = Mode.IDLE
-                elif 0 < buttons_clicked < 10:
+                elif 0 < buttons_clicked < NUM_BUTTONS:
                     self.volume_manager.set_music_volume_by_buttons(buttons_clicked)
-                elif buttons_clicked == 10:
+                elif buttons_clicked == NUM_BUTTONS:
                     self.mode = Mode.PARTYMODE
-                    self.volume_manager.play_sound_with_volume(winSound)
+                    self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS - 3)
+                    self.volume_manager.play_sound_with_volume(winSound, 1)
                     time.sleep(0.9)
                     self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS)
                 elif buttons_clicked == START_CODE_INPUT:
@@ -118,7 +121,7 @@ class AmplifierRuntime:
                 mute_level = byte - 20
                 self.volume_manager.set_music_volume_by_buttons(10 - mute_level)
                 if mute_level == 1:
-                    self.volume_manager.play_sound_with_volume(quiteSound, 1)
+                    self.volume_manager.play_sound_with_volume(quiteSound, 0.7)
                 elif mute_level == 10:
                     self.mode = Mode.IDLE
                     self.mixer.music.stop()
@@ -144,7 +147,7 @@ class AmplifierRuntime:
                     if self.song_chooser.is_valid_code(code):
                         self.send_code_valid_msg()
                         self.mixer.music.stop()
-                        self.volume_manager.play_sound_with_volume(introSound, 0.8)
+                        self.volume_manager.play_sound_with_volume(introSound, 0.5)
                         self.mode = Mode.PARTYMODE
                         self.load_song_by_code(code)
                         self.volume_manager.set_music_volume_by_buttons(NUM_BUTTONS)
@@ -209,9 +212,11 @@ class VolumeManager():
     current_max_volume = 1
 
     VOLUME_SCHEDULE = (
-        VolumeScheduleEntry(datetime.time(0, 0), 0.5),
-        VolumeScheduleEntry(datetime.time(6, 0), 1),
-        VolumeScheduleEntry(datetime.time(23, 0), 0.5),
+        VolumeScheduleEntry(datetime.time(0, 0), LOW_VOLUME_LIMIT),
+        VolumeScheduleEntry(datetime.time(7, 0), 1),
+        VolumeScheduleEntry(datetime.time(14, 0), LOW_VOLUME_LIMIT),
+        VolumeScheduleEntry(datetime.time(16, 0), 1),
+        VolumeScheduleEntry(datetime.time(23, 0), LOW_VOLUME_LIMIT),
     )
 
     def __init__(self, mixer, logger):

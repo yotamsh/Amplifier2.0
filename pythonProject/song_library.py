@@ -33,36 +33,30 @@ class Schedule():
         DailyScheduleEntry(datetime.time(0, 0),
                            {Collection.PARTY}),
         DailyScheduleEntry(datetime.time(2, 0),
-                           ALL_COLLECTIONS_EXCEPT_TV),
-        DailyScheduleEntry(datetime.time(6, 0),
+                           ALL_COLLECTIONS),
+        DailyScheduleEntry(datetime.time(4, 0),
                            {Collection.CLASSIC}),
-        DailyScheduleEntry(datetime.time(8, 0),
+        DailyScheduleEntry(datetime.time(7, 0),
                            {Collection.MORNING}),
         DailyScheduleEntry(datetime.time(10),
                            ALL_COLLECTIONS_EXCEPT_TV),
-        DailyScheduleEntry(datetime.time(11),
+        DailyScheduleEntry(datetime.time(14),
                            {Collection.TV}),
-        DailyScheduleEntry(datetime.time(12),
-                           {Collection.GENERAL, Collection.DISNEY, Collection.PARTY, Collection.MORNING}),
         DailyScheduleEntry(datetime.time(16),
-                           {Collection.TV}),
+                           {Collection.TV, Collection.GENERAL, Collection.DISNEY, Collection.PARTY,
+                            Collection.MORNING}),
         DailyScheduleEntry(datetime.time(17),
-                           ALL_COLLECTIONS),
-        DailyScheduleEntry(datetime.time(18),
-                           ALL_COLLECTIONS_EXCEPT_TV),
+                           {Collection.GENERAL, Collection.PARTY}),
         DailyScheduleEntry(datetime.time(20),
                            {Collection.DISNEY}),
         DailyScheduleEntry(datetime.time(20, 30),
-                           {Collection.GENERAL, Collection.DISNEY, Collection.PARTY, Collection.MORNING}),
+                           {Collection.GENERAL, Collection.DISNEY, Collection.PARTY}),
     )
 
     SPECIAL_SCHEDULE = (
         # start (datetime.datetime), end (datetime.datetime), collections (tuple of Collections)
         SpecialScheduleEntry(start=datetime.datetime(2022, 8, 18, 16, 00),
                              end=datetime.datetime(2022, 8, 18, 16, 30),
-                             collections={Collection.TV}),
-        SpecialScheduleEntry(start=datetime.datetime(2022, 8, 18, 18, 00),
-                             end=datetime.datetime(2022, 8, 18, 20, 30),
                              collections={Collection.TV}),
     )
 
@@ -79,31 +73,51 @@ class Schedule():
         return Schedule.DAILY_SCHEDULE[schedule_index].collections
 
 
-def regenerate_codes_all_songs():
-    num_songs = 0
+def generate_missing_codes(collections):
+    num_new_songs = 0
     num_collides = 0
+    existing_codes = set()
     with open('AmplifierSongCodes.csv', 'w', newline='') as database_file:
         writer = csv.writer(database_file)
         writer.writerow(["Collection", "Song Name", "Code"])
-        s = set()
+
+        # first, collect all existing codes
         for collection in ALL_COLLECTIONS:
             for file_path in os.listdir(SONGS_FOLDER_NAME + collection.value):
-                num_songs += 1
                 songpath = SONGS_FOLDER_NAME + collection.value + file_path
-                print(f"Generating new code for: {songpath}")
                 audio_file = eyed3.load(songpath)
-                new_code = code_generator.generate_new_code(CODE_LENGTH)
-                while new_code in s:
-                    num_collides += 1
-                    new_code = code_generator.generate_new_code(CODE_LENGTH)
                 if not audio_file.tag:
                     audio_file.tag = eyed3.id3.tag.Tag()
-                audio_file.tag.album = new_code
-                audio_file.tag.save(version=eyed3.id3.tag.ID3_V2_3)
-                s.add(new_code)
-                writer.writerow([collection.name, get_song_name(file_path), new_code])
-    print("Finished regenerating song codes.")
-    print(f'total songs = {num_songs}, num of collides = {num_collides}.')
+                existing_code = audio_file.tag.album
+                if code_generator.is_valid_code(existing_code, CODE_LENGTH):
+                    if existing_code in existing_codes:
+                        print(f"Error, code '{existing_code}' for song {songpath} already exists")
+                    else:
+                        print(f"song {songpath} already have a valid code")
+                        existing_codes.add(existing_code)
+                        writer.writerow([collection.name, get_song_name(file_path), existing_code])
+
+        # now add codes for new songs
+        for collection in collections:
+            for file_path in os.listdir(SONGS_FOLDER_NAME + collection.value):
+                songpath = SONGS_FOLDER_NAME + collection.value + file_path
+                audio_file = eyed3.load(songpath)
+                if not audio_file.tag:
+                    audio_file.tag = eyed3.id3.tag.Tag()
+                existing_code = audio_file.tag.album
+                if not code_generator.is_valid_code(existing_code, CODE_LENGTH):
+                    num_new_songs += 1
+                    print(f"Generating new code for: {songpath}")
+                    new_code = code_generator.generate_new_code(CODE_LENGTH)
+                    while new_code in existing_codes:
+                        num_collides += 1
+                        new_code = code_generator.generate_new_code(CODE_LENGTH)
+                    audio_file.tag.album = new_code
+                    existing_codes.add(new_code)
+                    audio_file.tag.save(version=eyed3.id3.tag.ID3_V2_3)
+                    writer.writerow([collection.name, get_song_name(file_path), new_code])
+    print("Finished generating new codes.")
+    print(f'total codes = {len(existing_codes)}, new songs = {num_new_songs}, num of collides = {num_collides}.')
 
 class SongChooser:
     current_collections = {}
@@ -144,7 +158,12 @@ class SongChooser:
                 songpath = SONGS_FOLDER_NAME + collection.value + filename
                 file = eyed3.load(songpath)
                 if file.tag and str(file.tag.album):
-                    self.codes_dic[str(file.tag.album)] = songpath
+                    code = str(file.tag.album)
+                    if code in self.codes_dic:
+                        print(
+                            f"Error, code {code} for song '{songpath}' already in dict for song '{self.codes_dic[code]}'.")
+                    else:
+                        self.codes_dic[str(file.tag.album)] = songpath
                 else:
                     pass
         print()
