@@ -25,6 +25,7 @@ class Collection(Enum):
 ALL_COLLECTIONS = {collection for collection in Collection}
 ALL_COLLECTIONS_EXCEPT_TV = {collection for collection in Collection if collection is not Collection.TV}
 
+
 class Schedule():
     DailyScheduleEntry = namedtuple("DailyScheduleEntry", ["time", "collections"])
     SpecialScheduleEntry = namedtuple("SpecialScheduleEntry", ["start", "end", "collections"])
@@ -76,6 +77,7 @@ class Schedule():
 def generate_missing_codes(collections):
     num_new_songs = 0
     num_collides = 0
+    num_errors = 0
     existing_codes = set()
     with open('AmplifierSongCodes.csv', 'w', newline='') as database_file:
         writer = csv.writer(database_file)
@@ -91,6 +93,7 @@ def generate_missing_codes(collections):
                 existing_code = audio_file.tag.album
                 if code_generator.is_valid_code(existing_code, CODE_LENGTH):
                     if existing_code in existing_codes:
+                        num_errors += 1
                         print(f"Error, code '{existing_code}' for song {songpath} already exists")
                     else:
                         print(f"song {songpath} already have a valid code")
@@ -117,7 +120,9 @@ def generate_missing_codes(collections):
                     audio_file.tag.save(version=eyed3.id3.tag.ID3_V2_3)
                     writer.writerow([collection.name, get_song_name(file_path), new_code])
     print("Finished generating new codes.")
-    print(f'total codes = {len(existing_codes)}, new songs = {num_new_songs}, num of collides = {num_collides}.')
+    print(f'total codes = {len(existing_codes)}, new songs = {num_new_songs}, '
+          f'num of collides = {num_collides}, num errors = {num_errors}.')
+
 
 class SongChooser:
     current_collections = {}
@@ -157,7 +162,7 @@ class SongChooser:
             for filename in os.listdir(SONGS_FOLDER_NAME + collection.value):
                 songpath = SONGS_FOLDER_NAME + collection.value + filename
                 file = eyed3.load(songpath)
-                if file.tag and str(file.tag.album):
+                if file.tag and code_generator.is_valid_code(str(file.tag.album), CODE_LENGTH):
                     code = str(file.tag.album)
                     if code in self.codes_dic:
                         print(

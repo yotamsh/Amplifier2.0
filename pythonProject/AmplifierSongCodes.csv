@@ -1,69 +1,26 @@
 Collection,Song Name,Code
-MORNING,AlcolirykoZ - Todo lo Bueno Tarda,35719
-MORNING,Aqua - Good Morning Sunshine,70148
-MORNING,Aretha Franklin - Say A Little Prayer For You,95843
-MORNING,Beatles - Blackbird,43172
-MORNING,Beatles - Good Day Sunshine,48052
-MORNING,Beatles - Here Comes The Sun,58910
-MORNING,Beauty and the Beast (Live Action) - Belle,68051
-MORNING,Buena Vista Social Club - De Camino a La Vereda (Official Audio) (320kbps),83705
-MORNING,Cat Stevens-Morning Has Broken,71980
-MORNING,"Chabuco - Margarita (Lyric Video) ft. Vicente García, Jose Quiñónez (320kbps)",39650
-MORNING,ECHO - שמש,14759
-MORNING,Elton John-Your Song,37296
-MORNING,Her Morning Elegance - Oren Lavie,30894
-MORNING,John Mayer - New Light,17598
-MORNING,Marco Antonio Solís - Si Te Pudiera Mentir (320kbps),72904
-MORNING,Mercedes Sosa - Alfonsina Y El Mar,85496
-MORNING,"Mercedes Sosa - Duerme, Negrito",40762
-MORNING,Mercedes Sosa - Gracias A La Vida,70296
-MORNING,Nintendo Wii - Mii Channel Theme - Jazz Cover __ insaneintherainmusic (feat. Gabe N. _ Chris A.),56273
-MORNING,Norah Jones - Feels Like Home - 01 - Sunrise,89467
-MORNING,Norah Jones - Feels Like Home - 05 - In The Morning,27469
-MORNING,POLO _ PAN — Les jolies choses (official audio) (320kbps),36172
-MORNING,Scoundrels - Sexy Weekend,68039
-MORNING,the tuesday crew - Summer Lovin',23647
-MORNING,Tu Me Haces Falta _ Eddie Santiago❤️ __letra❤️ (320kbps),25607
-MORNING,אבטיפוס - בוקר טוב עולם,15907
-MORNING,אושיק לוי - לישון לישון,72895
-MORNING,אחינועם ניני - בוקר,56743
-MORNING,אחינועם ניני- מזמור לילה,14309
-MORNING,אריאל זילבר   שמש שמש,42568
-MORNING,אריק איינשטיין - שבת בבוקר,46072
-MORNING,אריק איינשטיין אני אוהב לישון,69523
-MORNING,בוקר טוב - עוץ לי גוץ לי,47259
-MORNING,גלי עטרי - יש לך שמש,36942
-MORNING,ג׳יין בורדו - קרן שמש,68074
-MORNING,הבילויים - ניפגש על החוף,85431
-MORNING,שלומי שבן - שמש עלי אדמות,98502
-MORNING,שרי - לעולם בעקבות השמש,46735
-MORNING,תומר ישעיהו ודניאלה ספקטור - בוקר טוב,96015
-DISNEY,A Whole New World (320kbps),29417
-DISNEY,Anika Noni Rose - Almost There (From The Princess and the Frog),91267
-DISNEY,Arabian Nights - Bruce Adler - Aladdin (320kbps),24973
-DISNEY,Disney's Frozen Let It Go,52734
-DISNEY,Do You Want to Build a Snowman (From Frozen),80573
-DISNEY,Donna Murphy - Mother Knows Best (From Tangled),73461
-DISNEY,Dwayne Johnson - You're Welcome (from Moana),76812
-DISNEY,Friends on the Other Side - Princess and the Frog,72905
-DISNEY,FROZEN _ In Summer Song - Olaf,68539
-DISNEY,Hercules - Zero to Hero,72850
-DISNEY,High School Musical_ Breaking Free,51394
-DISNEY,Jim Cummings - Gonna Take You There (From The Princess and the Frog) ft. Terrance Simien,43867
-DISNEY,Love is an Open Door - Frozen,41907
-DISNEY,Mandy Moore - When Will My Life Begin,64392
-DISNEY,"Mandy Moore, Zachary Levi - I See the Light",62089
-DISNEY,Moana - How Far I'll Go,31462
-DISNEY,Mulan - Honor to us All,65890
-DISNEY,Princess and the Frog - Dig A Little Deeper - Disney,16437
-DISNEY,Tangled - I've Got a Dream,39425
-DISNEY,The Jungle Book _ The Bare Necessities Song,90842
-DISNEY,The Little Mermaid - Under the Sea,69154
-DISNEY,toy story - you've got a friend in me,40592
-DISNEY,When We're Human (From The Princess and the Frog),84710
-DISNEY,מולאן - אצלי תצאו גברים,34579
-DISNEY,ספר הג'ונגל_ מה שטוב לדוב,52384
-GENERAL,Abba - Dancing Queen,59374
+CLASSIC,Bach - Aria (from) Hunt Cantata,63804
+CLASSIC,"Chopin - Nocturne In C Minor, Op.48 No.1",26045
+CLASSIC,"Chopin - Piano Sonata No.3 In B Minor, O",39210
+CLASSIC,"Chopin - Prelude In D Flat Major, Op.28",35472
+CLASSIC,"Chopin - Prelude In E Minor, Op.28 No.4",56427
+CLASSIC,"Chopin, Frederic - 11 Prelude In D flat Major",39521
+CLASSIC,"Chopin, Frederic - 4 Waltz No.2 In A flat Major",85730
+CLASSIC,"Chopin, Frederic - 5 Waltz No.6 In D flat Major  Minute Waltz",86132
+CLASSIC,Couperin - Seconde Lecon-Vau,91536
+CLASSIC,Dave Brubeck - Take 5,69270
+CLASSIC,Debussy - Clair De Lune,48692
+CLASSIC,"Dvorak, Antonin - Humoreske",39716
+CLASSIC,Fantaisie-Impromptu In C Sharp Minor,87062
+CLASSIC,Handel - The Cheritable Shall Be,68415
+CLASSIC,Mercedes Sosa - Alfonsina Y El Mar,28745
+CLASSIC,Mercedes Sosa - Gracias A La Vida,60318
+CLASSIC,"Nocturne In E Flat Major, Op.9 No.2",72836
+CLASSIC,Purcell - Wondrous Machine,71356
+CLASSIC,Rameau - Entree Des Quatre Nation,60182
+CLASSIC,"Variations In B Flat Major, Op.2. Al",23470
+CLASSIC,Vivaldi - Nulla In Mundo Pax Sinc,31275
+CLASSIC,Vivaldi - the Four Seasons - Spring,94271
 GENERAL,Abba - Mamma mia,37652
 GENERAL,Abba - The Winner Takes It All,50847
 GENERAL,Alberta Hunter - Darktown Strutters Ball,37618
@@ -233,7 +190,162 @@ GENERAL,שלום חנוך - מחכים למשיח,25469
 GENERAL,שמוליק קראוס- לוח וגיר (320kbps),84903
 GENERAL,שרונה ודניאלה פיק - השיר הזה,78962
 GENERAL,שרונה ודניאלה פיק - שוב הגשם,41589
+DISNEY,A Whole New World (320kbps),29417
+DISNEY,Anika Noni Rose - Almost There (From The Princess and the Frog),91267
+DISNEY,Arabian Nights - Bruce Adler - Aladdin (320kbps),24973
+DISNEY,Disney's Frozen Let It Go,52734
+DISNEY,Do You Want to Build a Snowman (From Frozen),80573
+DISNEY,Donna Murphy - Mother Knows Best (From Tangled),73461
+DISNEY,Dwayne Johnson - You're Welcome (from Moana),76812
+DISNEY,Friends on the Other Side - Princess and the Frog,72905
+DISNEY,FROZEN _ In Summer Song - Olaf,68539
+DISNEY,Hercules - Zero to Hero,72850
+DISNEY,High School Musical_ Breaking Free,51394
+DISNEY,Jim Cummings - Gonna Take You There (From The Princess and the Frog) ft. Terrance Simien,43867
+DISNEY,Love is an Open Door - Frozen,41907
+DISNEY,Mandy Moore - When Will My Life Begin,64392
+DISNEY,"Mandy Moore, Zachary Levi - I See the Light",62089
+DISNEY,Moana - How Far I'll Go,31462
+DISNEY,Mulan - Honor to us All,65890
+DISNEY,Princess and the Frog - Dig A Little Deeper - Disney,16437
+DISNEY,Tangled - I've Got a Dream,39425
+DISNEY,The Jungle Book _ The Bare Necessities Song,90842
+DISNEY,The Little Mermaid - Under the Sea,69154
+DISNEY,toy story - you've got a friend in me,40592
+DISNEY,When We're Human (From The Princess and the Frog),84710
+DISNEY,מולאן - אצלי תצאו גברים,34579
+DISNEY,מלך האריות 2 - יחדיו כאיש אחד,16789
+DISNEY,ספר הג'ונגל - מה שטוב לדוב,52384
+TV,Chiquititas - Rinconcito de Luz,92637
+TV,Chiquititas - Volar Mejor,57921
+TV,Erreway-rebelde_way,40632
+TV,Erreway-resistire,52306
+TV,Merrie Melodies & Looney Tunes - Opening themes,54963
+TV,Pokemon Silver - New Bark Town,26904
+TV,Pokemon Silver - Surf Theme,86521
+TV,Pokemon Silver - Violet City,51289
+TV,Pokemon Silver - Wild Pokemon Battle,42150
+TV,Pokémon Silver - Elm Research Institute,15872
+TV,אנימניאקס - מדינות העולם,16704
+TV,דרדסים רמיקס,70581
+TV,טלויזיה - אוטובוס הקסמים,72968
+TV,טלויזיה - אנימניאקס,68957
+TV,טלויזיה - אריזה משפחתית,27016
+TV,טלויזיה - ארתור,60795
+TV,טלויזיה - בזיק ויויו,85926
+TV,טלויזיה - בילבי,67403
+TV,טלויזיה - בימבה,39142
+TV,טלויזיה - בלינקי ביל,14873
+TV,טלויזיה - בנות הפאוורפאף,85903
+TV,טלויזיה - גאיה גל וגילי,60473
+TV,טלויזיה - גברת פלפלת,97251
+TV,טלויזיה - גברת פלפלת2,86142
+TV,טלויזיה - דיג'ימון,45809
+TV,טלויזיה - דני שובבני,86594
+TV,טלויזיה - דרגון בול זי,27480
+TV,טלויזיה - דרדסים,29530
+TV,טלויזיה - האלופה,56084
+TV,טלויזיה - הביגבגים,91276
+TV,טלויזיה - הבית של גלוריה,73986
+TV,טלויזיה - הבית של פיסטוק,64531
+TV,טלויזיה - הדרדסים,67129
+TV,טלויזיה - החברה הטובים,79128
+TV,טלויזיה - הילדים מגבעת נפוליאון,12798
+TV,טלויזיה - היתקליף,15834
+TV,טלויזיה - הלב,29083
+TV,טלויזיה - המומינים,24609
+TV,טלויזיה - המופע של לולו,73614
+TV,טלויזיה - המחסן של כאילו,45936
+TV,טלויזיה - המלך בבר,70396
+TV,טלויזיה - המעבדה של דקסטר,85901
+TV,טלויזיה - המעופפים הנועזים,47608
+TV,טלויזיה - הנסיך המדליק מבל אייר,19764
+TV,טלויזיה - הפיג'מות,27840
+TV,טלויזיה - הפליסטונס,16349
+TV,טלויזיה - הפנתר הורוד,71065
+TV,טלויזיה - הקוסם מארץ עוץ,29804
+TV,טלויזיה - השיר שלנו,19438
+TV,טלויזיה - השלישיה,31842
+TV,טלויזיה - חברים,46280
+TV,טלויזיה - חוש חש הבלש,21983
+TV,טלויזיה - טאז,27156
+TV,טלויזיה - טומי ואוסקר,73580
+TV,טלויזיה - טייני טונס,49250
+TV,טלויזיה - לחיי האהבה,31680
+TV,טלויזיה - מיכאלה,34906
+TV,טלויזיה - משחק החיים,37480
+TV,טלויזיה - סדריק,36750
+TV,טלויזיה - סיפורי אבא בונה,63915
+TV,טלויזיה - סנופי,54709
+TV,טלויזיה - ספיידרמן,32895
+TV,טלויזיה - סקובי דו,74205
+TV,טלויזיה - עוגי והמקקים,48502
+TV,טלויזיה - עכבר העיר עכבר הכפר,13672
+TV,טלויזיה - עליסה בארץ הפלאות,70231
+TV,טלויזיה - ערוץ הילדים המקום האמיתי,36450
+TV,טלויזיה - פו הדב,76041
+TV,טלויזיה - פופאי,75468
+TV,טלויזיה - פוקימון,38701
+TV,טלויזיה - פיטר פן,39012
+TV,טלויזיה - פינקי והמוח,14083
+TV,טלויזיה - פספוסים,91762
+TV,טלויזיה - צבי הנינג'ה,21097
+TV,טלויזיה - צער גידול בנות,19067
+TV,טלויזיה - קופיקו,12780
+TV,טלויזיה - קטנטנות,95241
+TV,טלויזיה - קטקטים,24193
+TV,טלויזיה - קצפת,43182
+TV,טלויזיה - רגע עם דודלי,24075
+TV,טלויזיה - רדוול,81509
+TV,טלויזיה - רולי פולי אולי,70564
+TV,טלויזיה - רכבת ההפתעות,89540
+TV,טלויזיה - שיר הטלפון,71534
+TV,טלויזיה - שלושת המוסקטרים,16453
+TV,טלויזיה - שלתיאל קוואק,95067
+TV,טלויזיה- עלילות בבאי,78051
+TV,יגאל בשן - נילס הולגרסון,40971
+TV,שמש - שיר פתיחה,76384
+MORNING,AlcolirykoZ - Todo lo Bueno Tarda,35719
+MORNING,Aqua - Good Morning Sunshine,70148
+MORNING,Aretha Franklin - Say A Little Prayer For You,95843
+MORNING,Beatles - Blackbird,43172
+MORNING,Beatles - Good Day Sunshine,48052
+MORNING,Beatles - Here Comes The Sun,58910
+MORNING,Beauty and the Beast (Live Action) - Belle,68051
+MORNING,Buena Vista Social Club - De Camino a La Vereda (Official Audio) (320kbps),83705
+MORNING,Cat Stevens-Morning Has Broken,71980
+MORNING,"Chabuco - Margarita (Lyric Video) ft. Vicente García, Jose Quiñónez (320kbps)",39650
+MORNING,ECHO - שמש,14759
+MORNING,Elton John-Your Song,37296
+MORNING,Her Morning Elegance - Oren Lavie,30894
+MORNING,John Mayer - New Light,17598
+MORNING,Marco Antonio Solís - Si Te Pudiera Mentir (320kbps),72904
+MORNING,Mercedes Sosa - Alfonsina Y El Mar,85496
+MORNING,"Mercedes Sosa - Duerme, Negrito",40762
+MORNING,Mercedes Sosa - Gracias A La Vida,70296
+MORNING,Nintendo Wii - Mii Channel Theme - Jazz Cover __ insaneintherainmusic (feat. Gabe N. _ Chris A.),56273
+MORNING,Norah Jones - Feels Like Home - 01 - Sunrise,89467
+MORNING,Norah Jones - Feels Like Home - 05 - In The Morning,27469
+MORNING,POLO _ PAN — Les jolies choses (official audio) (320kbps),36172
+MORNING,Scoundrels - Sexy Weekend,68039
+MORNING,the tuesday crew - Summer Lovin',23647
+MORNING,Tu Me Haces Falta _ Eddie Santiago❤️ __letra❤️ (320kbps),25607
+MORNING,אבטיפוס - בוקר טוב עולם,15907
+MORNING,אושיק לוי - לישון לישון,72895
+MORNING,אחינועם ניני - בוקר,56743
+MORNING,אחינועם ניני- מזמור לילה,14309
+MORNING,אריאל זילבר   שמש שמש,42568
+MORNING,אריק איינשטיין - שבת בבוקר,46072
+MORNING,אריק איינשטיין אני אוהב לישון,69523
+MORNING,בוקר טוב - עוץ לי גוץ לי,47259
+MORNING,גלי עטרי - יש לך שמש,36942
+MORNING,ג׳יין בורדו - קרן שמש,68074
+MORNING,הבילויים - ניפגש על החוף,85431
+MORNING,שלומי שבן - שמש עלי אדמות,98502
+MORNING,שרי - לעולם בעקבות השמש,46735
+MORNING,תומר ישעיהו ודניאלה ספקטור - בוקר טוב,96015
 PARTY,a-ha - Take On Me,73286
+PARTY,Abba - Dancing Queen,59374
 PARTY,Adele - Rolling In The Deep,28361
 PARTY,ALEXANDRA STAN - Mr. Saxobeat,90178
 PARTY,Alice Deejay - Better Off Alone,48375
@@ -352,114 +464,39 @@ PARTY,רן דנקר - בית משוגעים,61083
 PARTY,שבק ס' - תתקעו בחצוצרה,26039
 PARTY,שוטי הנבואה - הילדים קופצים,69324
 PARTY,שרית חדד - בחום של תל אביב,31520
-CLASSIC,Bach - Aria (from) Hunt Cantata,63804
-CLASSIC,"Chopin - Nocturne In C Minor, Op.48 No.1",26045
-CLASSIC,"Chopin - Piano Sonata No.3 In B Minor, O",39210
-CLASSIC,"Chopin - Prelude In D Flat Major, Op.28",35472
-CLASSIC,"Chopin - Prelude In E Minor, Op.28 No.4",56427
-CLASSIC,"Chopin, Frederic - 11 Prelude In D flat Major",39521
-CLASSIC,"Chopin, Frederic - 4 Waltz No.2 In A flat Major",85730
-CLASSIC,"Chopin, Frederic - 5 Waltz No.6 In D flat Major  Minute Waltz",86132
-CLASSIC,Couperin - Seconde Lecon-Vau,91536
-CLASSIC,Dave Brubeck - Take 5,69270
-CLASSIC,Debussy - Clair De Lune,48692
-CLASSIC,"Dvorak, Antonin - Humoreske",39716
-CLASSIC,Fantaisie-Impromptu In C Sharp Minor,87062
-CLASSIC,Handel - The Cheritable Shall Be,68415
-CLASSIC,Mercedes Sosa - Alfonsina Y El Mar,28745
-CLASSIC,Mercedes Sosa - Gracias A La Vida,60318
-CLASSIC,"Nocturne In E Flat Major, Op.9 No.2",72836
-CLASSIC,Purcell - Wondrous Machine,71356
-CLASSIC,Rameau - Entree Des Quatre Nation,60182
-CLASSIC,"Variations In B Flat Major, Op.2. Al",23470
-CLASSIC,Vivaldi - Nulla In Mundo Pax Sinc,31275
-CLASSIC,Vivaldi - the Four Seasons - Spring,94271
-TV,Chiquititas - Rinconcito de Luz,92637
-TV,Chiquititas - Volar Mejor,57921
-TV,Erreway-rebelde_way,40632
-TV,Erreway-resistire,52306
-TV,Merrie Melodies & Looney Tunes - Opening themes,54963
-TV,Pokemon Silver - New Bark Town,26904
-TV,Pokemon Silver - Surf Theme,86521
-TV,Pokemon Silver - Violet City,51289
-TV,Pokemon Silver - Wild Pokemon Battle,42150
-TV,Pokémon Silver - Elm Research Institute,15872
-TV,אנימניאקס - מדינות העולם,16704
-TV,דרדסים רמיקס,70581
-TV,טלויזיה - אוטובוס הקסמים,72968
-TV,טלויזיה - אנימניאקס,68957
-TV,טלויזיה - אריזה משפחתית,27016
-TV,טלויזיה - ארתור,60795
-TV,טלויזיה - בזיק ויויו,85926
-TV,טלויזיה - בילבי,67403
-TV,טלויזיה - בימבה,39142
-TV,טלויזיה - בלינקי ביל,14873
-TV,טלויזיה - בנות הפאוורפאף,85903
-TV,טלויזיה - גאיה גל וגילי,60473
-TV,טלויזיה - גברת פלפלת,97251
-TV,טלויזיה - גברת פלפלת2,86142
-TV,טלויזיה - דיג'ימון,45809
-TV,טלויזיה - דני שובבני,86594
-TV,טלויזיה - דרגון בול זי,27480
-TV,טלויזיה - דרדסים,29530
-TV,טלויזיה - האלופה,56084
-TV,טלויזיה - הביגבגים,91276
-TV,טלויזיה - הבית של גלוריה,73986
-TV,טלויזיה - הבית של פיסטוק,64531
-TV,טלויזיה - הדרדסים,67129
-TV,טלויזיה - החברה הטובים,79128
-TV,טלויזיה - הילדים מגבעת נפוליאון,12798
-TV,טלויזיה - היתקליף,15834
-TV,טלויזיה - הלב,29083
-TV,טלויזיה - המומינים,24609
-TV,טלויזיה - המופע של לולו,73614
-TV,טלויזיה - המחסן של כאילו,45936
-TV,טלויזיה - המלך בבר,70396
-TV,טלויזיה - המעבדה של דקסטר,85901
-TV,טלויזיה - המעופפים הנועזים,47608
-TV,טלויזיה - הנסיך המדליק מבל אייר,19764
-TV,טלויזיה - הפיג'מות,27840
-TV,טלויזיה - הפליסטונס,16349
-TV,טלויזיה - הפנתר הורוד,71065
-TV,טלויזיה - הקוסם מארץ עוץ,29804
-TV,טלויזיה - השיר שלנו,19438
-TV,טלויזיה - השלישיה,31842
-TV,טלויזיה - חברים,46280
-TV,טלויזיה - חוש חש הבלש,21983
-TV,טלויזיה - טאז,27156
-TV,טלויזיה - טומי ואוסקר,73580
-TV,טלויזיה - טייני טונס,49250
-TV,טלויזיה - לחיי האהבה,31680
-TV,טלויזיה - מיכאלה,34906
-TV,טלויזיה - משחק החיים,37480
-TV,טלויזיה - סדריק,36750
-TV,טלויזיה - סיפורי אבא בונה,63915
-TV,טלויזיה - סנופי,54709
-TV,טלויזיה - ספיידרמן,32895
-TV,טלויזיה - סקובי דו,74205
-TV,טלויזיה - עוגי והמקקים,48502
-TV,טלויזיה - עכבר העיר עכבר הכפר,13672
-TV,טלויזיה - עליסה בארץ הפלאות,70231
-TV,טלויזיה - ערוץ הילדים המקום האמיתי,36450
-TV,טלויזיה - פו הדב,76041
-TV,טלויזיה - פופאי,75468
-TV,טלויזיה - פוקימון,38701
-TV,טלויזיה - פיטר פן,39012
-TV,טלויזיה - פינקי והמוח,14083
-TV,טלויזיה - פספוסים,91762
-TV,טלויזיה - צבי הנינג'ה,21097
-TV,טלויזיה - צער גידול בנות,19067
-TV,טלויזיה - קופיקו,12780
-TV,טלויזיה - קטנטנות,95241
-TV,טלויזיה - קטקטים,24193
-TV,טלויזיה - קצפת,43182
-TV,טלויזיה - רגע עם דודלי,24075
-TV,טלויזיה - רדוול,81509
-TV,טלויזיה - רולי פולי אולי,70564
-TV,טלויזיה - רכבת ההפתעות,89540
-TV,טלויזיה - שיר הטלפון,71534
-TV,טלויזיה - שלושת המוסקטרים,16453
-TV,טלויזיה - שלתיאל קוואק,95067
-TV,טלויזיה- עלילות בבאי,78051
-TV,יגאל בשן - נילס הולגרסון,40971
-TV,שמש - שיר פתיחה,76384
+GENERAL,Adolescente - Chiquititas,59087
+GENERAL,Bellaire - Paris City Jazz,69081
+GENERAL,Black-winged Stilt (feat. Secret Bad Boy),73628
+GENERAL,Cat Steavens - Father And Son,96523
+GENERAL,Cat Steavens - Moonshadow,83906
+GENERAL,Dr Lonnie Smith - When The Night Is Right,96178
+GENERAL,Hakuna Matata - The Lion King,34281
+GENERAL,Hamilton - Guns and Ships,47652
+GENERAL,Hamilton - The Story of Tonight,89405
+GENERAL,Hamilton - Wait for It,84169
+GENERAL,Hamilton - You'll Be Back,82596
+GENERAL,Hymn To The Soul המנון לנשמה,51037
+GENERAL,Memphis Underground - Herbie Mann ,72806
+GENERAL,Mika -  Happy ending,30286
+GENERAL,MIKA - Stardust,10984
+GENERAL,Noku Mana נוקו מאנה,84526
+GENERAL,Rising above (if you fell it you can heal it),87645
+GENERAL,Steven Universe The Movie - No Matter What,89513
+GENERAL,Stevie Wonder - For Once In My Life,50672
+GENERAL,Supertramp - Goodbye Stranger,39205
+GENERAL,Sylvan Esso - There Are Many Ways to Say I Love You,51869
+GENERAL,Tammy Ben Hadar - Yesh Baolam תמי בן הדר - יש בעולם,83410
+GENERAL,the Beatles - Lucy In The Sky With Diamonds,57062
+GENERAL,Tom Rosenthal - You Might Find Yours,35018
+GENERAL,אקו - אין ממה לפחד ECHO - nothing to fear about,51207
+GENERAL,לולה - ימים של שקט,62598
+GENERAL,לכל קול מקום,32179
+GENERAL,עלי רוחי,70854
+GENERAL,קורין אלאל - אי שם בלב,35786
+GENERAL,שוקולד מנטה מסטיק - זה טוב זה טוב,93457
+DISNEY,Hercules - I Won't Say I'm In Love הרקולס- לא אודה באהבה,18204
+MORNING,איך אוכל להמשיך לישון,35690
+PARTY,Earth Wind & Fire - Boogie Wonderland,80695
+PARTY,"Earth, Wind & Fire - Got to Get You Into My Life",63947
+PARTY,Electric Light Orchestra - Livin' Thing,85904
+PARTY,VULFPECK - Back Pocket,73860
