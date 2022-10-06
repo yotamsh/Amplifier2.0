@@ -17,7 +17,7 @@ class Mode(Enum):
     PARTYMODE = 3
     CODEINPUT = 4
 
-
+ARDUINO_PORT = "COM8"
 NO_DATA = -1
 NUM_BUTTONS = 10
 START_CODE_INPUT = 77
@@ -33,7 +33,7 @@ pygame.init()
 winSound = pygame.mixer.Sound("sounds/win.mp3")
 codeSound = pygame.mixer.Sound("sounds/code.mp3")
 introSound = pygame.mixer.Sound("sounds/one_two_three.mp3")
-codeInputMusicPath = "sounds/sheshtus.mp3"
+codeInputMusicPath = "sounds/sheshtus_long_voice.mp3"
 failSounds = ["fail1.mp3", "fail2.mp3", "fail3.mp3", "fail4.mp3"]
 quiteSound = pygame.mixer.Sound("sounds/quite.mp3")
 boomSound = pygame.mixer.Sound("sounds/boom.mp3")
@@ -42,7 +42,7 @@ boomSound = pygame.mixer.Sound("sounds/boom.mp3")
 class AmplifierRuntime:
 
     def __init__(self):
-        self.arduino = serial.Serial(port="COM7", baudrate=9600, timeout=0.1, )
+        self.arduino = serial.Serial(port=ARDUINO_PORT, baudrate=9600, timeout=0.1, )
         self.mixer = pygame.mixer
         self.mixer.pre_init()
         self.mixer.init()
@@ -139,11 +139,11 @@ class AmplifierRuntime:
         while self.mode == Mode.CODEINPUT:
             msg = self.recieve_byte_msg()
             if msg != NO_DATA:
-                if msg == STOP_CODE_INPUT:  # msg to enter codeinput mode
+                if msg == STOP_CODE_INPUT:  # msg to stop codeinput mode
                     self.mode = Mode.IDLE
                 elif msg == GET_CODE_INPUT:  # msg with some code song
                     msg = self.arduino.read(CODE_LENGTH)
-                    code = msg[:5].decode("ascii")
+                    code = msg[:CODE_LENGTH].decode("ascii")
                     if self.song_chooser.is_valid_code(code):
                         self.send_code_valid_msg()
                         self.mixer.music.stop()
@@ -250,3 +250,28 @@ class VolumeManager():
 
 def new_line_print(s):
     print("\n", s, end="", flush=True)
+
+
+def testVolumes():
+    mixer = pygame.mixer
+    logger = logs.Logger()
+    volume_manager = VolumeManager(mixer, logger)
+    mixer.music.load("songs/general/ישראל בר-און - הנני מצהיר בזאת.mp3")
+
+    volume_manager.current_max_volume = LOW_VOLUME_LIMIT
+    print(f"VOLUME LIMIT = {volume_manager.current_max_volume}")
+    mixer.music.play()
+    for i in range(1, NUM_BUTTONS + 1):
+        print(f"buttons clicked = {i}")
+        volume_manager.set_music_volume_by_buttons(i)
+        time.sleep(2)
+    time.sleep(5)
+
+    volume_manager.current_max_volume = 1
+    print(f"VOLUME LIMIT = {volume_manager.current_max_volume}")
+    for i in range(1, NUM_BUTTONS + 1):
+        print(f"buttons clicked = {i}")
+        volume_manager.set_music_volume_by_buttons(i)
+        time.sleep(2)
+    time.sleep(5)
+    mixer.music.stop()

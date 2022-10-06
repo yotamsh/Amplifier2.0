@@ -10,10 +10,11 @@
 #define MAIN_LEDS_NUM 300
 #define MAIN_LEDS_PIN 22
 #define LEG_LEDS_NUM 54
-#define LEG_LEDS_PIN 23
+#define LEG_R_LEDS_PIN 24
+#define LEG_L_LEDS_PIN 25
 #define LEG_LEN 23
 #define LEG_MID_LEN 8
-#define BUTTONS_LIGHT_PIN 24
+#define BUTTONS_LIGHT_PIN 26
 #define NUM_BUTTONS 10
 #define CLICKED 1
 #define UNCLICKED 0
@@ -25,6 +26,7 @@
 #define FIREWORK_LEN 15
 #define CODE_LENGTH 5
 #define PARTY_MODE_SLEEPS_NUM 5
+#define CODE_INPUT_MODE_DURATION 51050
 
 #define IDLE_MODE 0b1
 #define AMPLIFYING_MODE 0b10
@@ -32,11 +34,11 @@
 #define CODE_INPUT_MODE 0b1000
 
 const byte KEEP_ON_CMD[CODE_LENGTH] = {9,8,8,8,9}; 
-const byte TERMINATE_CMD[CODE_LENGTH] = {9,8,8,9,8}; 
+const byte TERMINATE_CMD[CODE_LENGTH] = {0,1,1,1,0}; 
 const unsigned long PARTY_MODE_SLEEP_DELAYS[PARTY_MODE_SLEEPS_NUM] = {20000,10000,10000,20000,50000};
 // pins of button number {0, 1, ... , 9}
-byte buttonPins[NUM_BUTTONS] = {38,39,40,41,42,43,45,44,46,47}; //{2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
-bool testing = true;
+byte buttonPins[NUM_BUTTONS] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+bool testing = false;
 
 // Structs //
 
@@ -64,9 +66,9 @@ struct buttons_state{
       total += current[i];
     }
     if(testing && current[2]){
-      total = 9 + (current[NUM_BUTTONS-1] ? 1 :0) ;
-      wasChanged = current[2] != prev[2] || current[9] != prev[9];
-      for (byte i=0 ; i < NUM_BUTTONS-1 ; i++){ current[i]=CLICKED; }   
+      total = 9 + (current[0] ? 1 :0) ;
+      wasChanged = current[2] != prev[2] || current[0] != prev[0];
+      for (byte i=1 ; i < NUM_BUTTONS ; i++){ current[i]=CLICKED; }   
     }
   }
   
@@ -139,7 +141,8 @@ uint8_t gLegBrightness = 50;
 CRGB mainLeds[MAIN_LEDS_NUM];
 CLEDController* mainController;
 CRGB legLeds[LEG_LEDS_NUM];
-CLEDController* legsController;
+CLEDController* legLController;
+CLEDController* legRController;
 
 byte mode;
 byte sevenCounter;
@@ -152,10 +155,12 @@ const PROGMEM uint16_t permutation[] = {237, 67, 253, 198, 279, 179, 247, 92, 5,
 void setup() {
   Serial.begin(9600);
   mainController = &FastLED.addLeds<WS2812B, MAIN_LEDS_PIN, GRB>(mainLeds, MAIN_LEDS_NUM);  // GRB ordering is typical  
-  legsController = &FastLED.addLeds<WS2812B, LEG_LEDS_PIN, GRB>(legLeds, LEG_LEDS_NUM);  // GRB ordering is typical  
+  legRController = &FastLED.addLeds<WS2812B, LEG_R_LEDS_PIN, GRB>(legLeds, LEG_LEDS_NUM);  // GRB ordering is typical  
+  legLController = &FastLED.addLeds<WS2812B, LEG_L_LEDS_PIN, GRB>(legLeds, LEG_LEDS_NUM);  // GRB ordering is typical  
   mainController->setDither(0);
   mainController->setCorrection(TypicalSMD5050);
-  legsController->setTemperature(Tungsten40W );
+  legRController->setTemperature(Tungsten40W );
+  legLController->setTemperature(Tungsten40W );
   FastLED.setBrightness(20);
 
   for (byte i=0 ; i < NUM_BUTTONS ; i++){
@@ -238,7 +243,7 @@ void runIdleMode(){
           for(int i=0; i<LEG_LEDS_NUM; i++) legLeds[i]+=CRGB(2,2,2);
         }
         else fadeToBlackBy(legLeds, LEG_LEDS_NUM, 5);
-        legsController->showLeds(gLegBrightness);
+        showLegs();
       }
     }
   }
@@ -324,7 +329,7 @@ void updateAmplifyingModeLighting(int &animationIndex, bool &reverse){
     if (lightPart > LEG_MID_LEN) {
       fill_solid(&legLeds[LEG_LEN], LEG_MID_LEN, CRGB::White);
     }
-    legsController->showLeds(gLegBrightness);
+    showLegs();
   }
 }
 
@@ -417,10 +422,13 @@ void runPartyMode(){
           if (sleepUntil < currentTime+currentDelay) { sleepUntil = currentTime+currentDelay; }
         }
       }
-      if (buttonsState.gotCommand(KEEP_ON_CMD)) { sleepUntil += 600000; }
+      if (buttonsState.gotCommand(KEEP_ON_CMD)) { 
+        sleepUntil += 600000; 
+        }
       if (buttonsState.gotCommand(TERMINATE_CMD)) {
         sleepUntil = currentTime - 10001;
         muteLevel = 7;
+        sleepPhaseNum = 1;
         buttonsState.setWaitReleaseAll();
       }
     }
@@ -487,7 +495,7 @@ void updatePartyModeLighting(byte &startAnimation, int &permutationIndex, byte m
             fill_solid(&legLeds[LEG_LEN], lightPart-2*LEG_LEN, CRGB::White);
           }
         }
-        legsController->showLeds(gLegBrightness);
+        showLegs();
       }
     }
   else if (startAnimation < MAIN_LEDS_NUM/2 + 8){
@@ -501,7 +509,7 @@ void updatePartyModeLighting(byte &startAnimation, int &permutationIndex, byte m
         fill_solid(legLeds, LEG_LEDS_NUM, CRGB::Black); 
       }
       mainController->showLeds(gMainBrightness);
-      legsController->showLeds(gLegBrightness);
+      showLegs();
     }
     EVERY_N_MILLISECONDS(400){
       // FOR BLINKING AFTER START ANIMATION
@@ -516,7 +524,7 @@ void updatePartyModeLighting(byte &startAnimation, int &permutationIndex, byte m
           if(!fireworks[i].isFinished()) fireworks[i].promote(mainLeds);
         }
         fill_solid(legLeds, LEG_LEDS_NUM, CHSV(beat8(5), 120, 255));
-        legsController->showLeds(gLegBrightness);
+        showLegs();
       }
       else {
         // mute
@@ -588,7 +596,7 @@ void enterCodeInputModeLighting(){
     mainController->showLeds(gMainBrightness);
   }
   fill_solid(legLeds, LEG_LEDS_NUM, CHSV(HUE_BLUE+10, 150, 255));
-  legsController->showLeds(gLegBrightness);
+  showLegs();
 }
 
 void setCodeInputModeButtonsLighting(){
@@ -622,7 +630,7 @@ void updateCodeInput(
     byte &codeSize, 
     unsigned long codeInputModeTimestamp, bool &failed){
   unsigned long currentTime = millis();
-  if(currentTime - codeInputModeTimestamp > 38661){
+  if(currentTime - codeInputModeTimestamp > CODE_INPUT_MODE_DURATION){
     failed = true;
     return;
   }
@@ -709,4 +717,9 @@ void fillLeds(int from, int to, CRGB value){
   for (int i=from; i < to; i++){
     mainLeds[i] = value;
   }
+}
+
+void showLegs(){
+  legLController->showLeds(gLegBrightness);
+  legRController->showLeds(gLegBrightness);
 }
